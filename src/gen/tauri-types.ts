@@ -5,30 +5,30 @@ export type Procedures = {
         { key: "config.get", input: never, result: Config } | 
         { key: "config.getDefaultMusicFolder", input: never, result: string } | 
         { key: "config.pickFolder", input: never, result: string | null } | 
-        { key: "getLibrary", input: never, result: Library } | 
-        { key: "player.getCurrentSongData", input: never, result: CurrentSongData },
+        { key: "getLibrary", input: never, result: Library },
     mutations: 
         { key: "config.set", input: Config, result: null } | 
-        { key: "player.nextSong", input: never, result: string | null } | 
+        { key: "player.nextSong", input: never, result: null } | 
         { key: "player.playSong", input: PlaySongInput, result: null } | 
-        { key: "player.previousSong", input: never, result: string | null } | 
+        { key: "player.previousSong", input: never, result: null } | 
         { key: "player.seek", input: number, result: null } | 
-        { key: "player.setPause", input: boolean, result: null },
-    subscriptions: never
+        { key: "player.togglePause", input: never, result: null },
+    subscriptions: 
+        { key: "player.currentSong", input: never, result: CurrentSongData }
 };
 
 export type PlaySongInput = { song_id: string; scope: PlayerScope }
-
-export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
 export type Artist = { name: string }
 
 export type Config = { music_folders: string[] }
 
-export type CurrentSongData = { song_id: string | null; started_at: number }
-
 export type Album = { name: string; cover_art: string | null; artist: string }
 
+export type CurrentSongData = { current_song: string | null; song_started_at: number; paused_at: number | null }
+
 export type Library = { artists: { [key: string]: Artist }; albums: { [key: string]: Album }; songs: { [key: string]: Song } }
+
+export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
 export type Song = { title: string; path: string; duration: number; album: string }

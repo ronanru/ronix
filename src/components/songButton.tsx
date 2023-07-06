@@ -1,12 +1,20 @@
+import { api } from '@/api';
 import type { FullSong } from '@/library';
-import { playSong } from '@/state';
 import { type Component } from 'solid-js';
 import CoverArt from './coverArt';
 
 const SongButton: Component<FullSong> = (props) => {
   return (
     <button
-      onClick={() => playSong(props.id)}
+      onClick={() =>
+        api.mutation([
+          'player.playSong',
+          {
+            scope: 'Library',
+            song_id: props.id,
+          },
+        ])
+      }
       class="grid w-full grid-cols-[3rem,1fr,2rem] items-center gap-4 rounded-xl p-4 transition-colors hover:bg-primary-900"
     >
       <CoverArt src={props.cover_art} class="h-12 w-12 rounded-lg" />

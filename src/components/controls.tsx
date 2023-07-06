@@ -1,12 +1,6 @@
+import { api } from '@/api';
+import { CurrentSongData } from '@/gen/tauri-types';
 import { library } from '@/library';
-import {
-  nextSong,
-  previousSong,
-  seek,
-  state,
-  togglePause,
-  updateCurrentSong,
-} from '@/state';
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-solid';
 import {
   Show,
@@ -21,57 +15,33 @@ import CoverArt from './coverArt';
 import Button from './ui/button';
 
 const Controls: Component = () => {
-  let animationFrame: number;
-  let isUpdateRequestSent = false;
+  const [currentSongData, setCurrentSongData] = createSignal<CurrentSongData>({
+    current_song: null,
+    paused_at: Infinity,
+    song_started_at: Infinity,
+  });
+
+  let animationFrame: number | null = null;
 
   const [currentTime, setCurrentTime] = createSignal(0);
-  const [currentSongDuration, setCurrentSongDuration] = createSignal(Infinity);
 
-  const currentSong = () => library()?.songs[state.currentSong!]!;
+  const currentSong = () => library()?.songs[currentSongData()?.current_song!]!;
   const currentAlbum = () => library()?.albums[currentSong()?.album!]!;
   const currentArtist = () => library()?.artists[currentAlbum()?.artist!]!;
 
-  let update = () => {
-    if (!state.pausedAt) {
-      const newCurrentTime = Date.now() - state.songStartedAt;
-      if (newCurrentTime < currentSongDuration()) {
-        setCurrentTime(newCurrentTime);
-      } else if (!isUpdateRequestSent) {
-        isUpdateRequestSent = true;
-        setTimeout(() => {
-          updateCurrentSong().then(() => {
-            isUpdateRequestSent = false;
-          });
-        }, 250);
-      }
-    }
+  const updateCurrentTime = () =>
+    setCurrentTime(
+      currentSongData().paused_at
+        ? (currentSongData().paused_at! - currentSongData().song_started_at) *
+            1000
+        : Date.now() - currentSongData().song_started_at * 1000
+    );
+  const update = () => {
+    updateCurrentTime();
     animationFrame = requestAnimationFrame(update);
   };
 
-  createEffect(
-    on(currentSong, () =>
-      setCurrentSongDuration(currentSong()?.duration || Infinity)
-    )
-  );
-
-  createEffect(
-    on(
-      () => state.pausedAt,
-      () => {
-        if (state.pausedAt) cancelAnimationFrame(animationFrame);
-        else update();
-      }
-    )
-  );
-
-  const onSeek = (event: MouseEvent) => {
-    const seekTo = Math.round(
-      (event.clientX / window.innerWidth) * currentSongDuration()
-    );
-    setCurrentTime(seekTo);
-    seek(seekTo);
-  };
-
+  const currentSongDuration = () => currentSong()?.duration * 1000;
   const currentMinutes = () => Math.floor(currentTime() / 60000);
   const currentSeconds = () =>
     (Math.floor(currentTime() / 1000) % 60).toString().padStart(2, '0');
@@ -79,11 +49,36 @@ const Controls: Component = () => {
   const durationSeconds = () =>
     (Math.floor(currentSongDuration() / 1000) % 60).toString().padStart(2, '0');
 
-  onMount(update);
-  onCleanup(() => cancelAnimationFrame(animationFrame));
+  onMount(() => {
+    api.addSubscription(['player.currentSong'] as any, {
+      onData: setCurrentSongData,
+    });
+    update();
+  });
+
+  onCleanup(() => animationFrame && cancelAnimationFrame(animationFrame));
+
+  const onSeek = (e: MouseEvent & { currentTarget: HTMLDivElement }) => {
+    const seekTo = Math.floor(
+      (e.clientX / e.currentTarget.clientWidth) * currentSong()!.duration
+    );
+    api.mutation(['player.seek', seekTo]);
+  };
+  const togglePause = () => api.mutation(['player.togglePause']);
+  const nextSong = () => api.mutation(['player.nextSong']);
+  const previousSong = () => api.mutation(['player.previousSong']);
+
+  createEffect(
+    on(currentSongData, () => {
+      if (!currentSongData().current_song) setCurrentTime(0);
+      updateCurrentTime();
+      if (currentSongData().paused_at) cancelAnimationFrame(animationFrame!);
+      else update();
+    })
+  );
 
   return (
-    <Show when={state.currentSong}>
+    <Show when={currentSongData().current_song}>
       <section aria-label="Player controls" class="relative w-full">
         <div
           role="slider"
@@ -123,7 +118,7 @@ const Controls: Component = () => {
             <SkipBack />
           </Button>
           <Button variant="light" class="rounded-none" onClick={togglePause}>
-            {state.pausedAt ? (
+            {currentSongData().paused_at ? (
               <Play fill="currentColor" />
             ) : (
               <Pause fill="currentColor" />

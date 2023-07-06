@@ -66,7 +66,7 @@ pub fn read_from_dirs(dirs: &Vec<PathBuf>) -> Library {
                 .to_string();
               let title = tags.title().as_deref().unwrap_or("Unknown").to_string();
               let path = file.path().to_path_buf();
-              let duration = tagged_file.properties().duration().as_millis();
+              let duration = tagged_file.properties().duration().as_secs();
               let artist_id = match artists.iter().find(|a| a.1.name == artist_name) {
                 Some(artist) => artist.0.clone(),
                 None => {
