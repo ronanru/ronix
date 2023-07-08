@@ -6,15 +6,16 @@ mod player;
 use config::{get_config_file, Config};
 use gst_player::{Player, PlayerSignalDispatcher, PlayerVideoRenderer};
 use library::{read_from_dirs, Library};
-use player::{next_song, previous_song, toggle_pause};
+use player::{next_song, previous_song, seek, toggle_pause};
 use rspc::{Config as RspcConfig, Router, Type};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use souvlaki::{MediaControlEvent, MediaControls, PlatformConfig};
 use std::{
   sync::{Arc, Mutex},
   time::{SystemTime, UNIX_EPOCH},
 };
 
+#[derive(Serialize, Clone, Type, PartialEq)]
 pub enum RepeatMode {
   None,
   One,
@@ -47,6 +48,7 @@ pub struct PlayerState {
   pub scope: PlayerScope,
   pub song_started_at: u32,
   pub paused_at: Option<u32>,
+  pub volume: f64,
 }
 
 impl Default for PlayerState {
@@ -61,6 +63,7 @@ impl Default for PlayerState {
       scope: PlayerScope::Library,
       song_started_at: get_current_time(),
       paused_at: Some(get_current_time()),
+      volume: 0.5,
     }
   }
 }
@@ -77,7 +80,7 @@ async fn main() {
   gst::init().unwrap();
 
   let router = Router::<Context>::new()
-    .query("getLibrary", |t| {
+    .query("library.get", |t| {
       t(|ctx, _input: ()| ctx.library.lock().unwrap().clone())
     })
     .merge("config.", config::get_router())
@@ -91,6 +94,7 @@ async fn main() {
     None::<PlayerVideoRenderer>,
     None::<PlayerSignalDispatcher>,
   ));
+  player.set_volume(0.5);
 
   let player_state = Arc::new(Mutex::new(PlayerState::default()));
 
@@ -136,12 +140,23 @@ async fn main() {
   let library_clone = library.clone();
   let os_controls_clone = os_controls.clone();
   player.connect_end_of_stream(move |p| {
-    next_song(
-      &mut player_state_clone.lock().unwrap(),
-      &library_clone.lock().unwrap(),
-      &p,
-      &mut os_controls_clone.lock().unwrap(),
-    );
+    let mut state = player_state_clone.lock().unwrap();
+    if state.repeat_mode == RepeatMode::One {
+      seek(&mut state, &p, 0);
+    } else {
+      next_song(
+        &mut state,
+        &library_clone.lock().unwrap(),
+        &p,
+        &mut os_controls_clone.lock().unwrap(),
+      );
+    }
+  });
+
+  let player_state_clone = player_state.clone();
+  player.connect_volume_changed(move |p| {
+    let mut state = player_state_clone.lock().unwrap();
+    state.volume = p.volume();
   });
 
   let context = Context {

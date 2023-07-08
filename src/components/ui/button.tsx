@@ -12,7 +12,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-primary-900',
       },
       size: {
-        small: '',
+        small: 'text-sm px-2 py-1 rounded-md font-medium gap-2',
         default: 'px-4 py-2 rounded-lg font-semibold gap-4',
       },
     },

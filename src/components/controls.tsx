@@ -1,9 +1,22 @@
 import { api } from '@/api';
-import { CurrentSongData } from '@/gen/tauri-types';
+import { CurrentSongData, RepeatMode } from '@/gen/tauri-types';
 import { library } from '@/library';
-import { Pause, Play, SkipBack, SkipForward } from 'lucide-solid';
 import {
+  PauseIcon,
+  PlayIcon,
+  Repeat1Icon,
+  RepeatIcon,
+  ShuffleIcon,
+  SkipBackIcon,
+  SkipForwardIcon,
+  Volume1Icon,
+  Volume2Icon,
+  VolumeXIcon,
+} from 'lucide-solid';
+import {
+  Match,
   Show,
+  Switch,
   createEffect,
   createSignal,
   on,
@@ -19,14 +32,21 @@ const Controls: Component = () => {
     current_song: null,
     paused_at: Infinity,
     song_started_at: Infinity,
+    volume: 0.5,
   });
 
   let animationFrame: number | null = null;
 
   const [currentTime, setCurrentTime] = createSignal(0);
 
+  const [repeatMode, setRepeatMode] = createSignal<RepeatMode>('None');
+  const [isShuffled, setIsShuffled] = createSignal(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   const currentSong = () => library()?.songs[currentSongData()?.current_song!]!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   const currentAlbum = () => library()?.albums[currentSong()?.album!]!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
   const currentArtist = () => library()?.artists[currentAlbum()?.artist!]!;
 
   const updateCurrentTime = () =>
@@ -50,6 +70,7 @@ const Controls: Component = () => {
     (Math.floor(currentSongDuration() / 1000) % 60).toString().padStart(2, '0');
 
   onMount(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     api.addSubscription(['player.currentSong'] as any, {
       onData: setCurrentSongData,
     });
@@ -58,7 +79,7 @@ const Controls: Component = () => {
 
   onCleanup(() => animationFrame && cancelAnimationFrame(animationFrame));
 
-  const onSeek = (e: MouseEvent & { currentTarget: HTMLDivElement }) => {
+  const onSeek = (e: MouseEvent & { currentTarget: HTMLButtonElement }) => {
     const seekTo = Math.floor(
       (e.clientX / e.currentTarget.clientWidth) * currentSong()!.duration
     );
@@ -77,10 +98,19 @@ const Controls: Component = () => {
     })
   );
 
+  const toggleShuffle = () =>
+    api.mutation(['player.toggleShuffle']).then(setIsShuffled);
+
+  const toggleRepeatMode = () =>
+    api.mutation(['player.toggleRepeatMode']).then(setRepeatMode);
+
+  const setVolume = (volume: number) =>
+    api.mutation(['player.setVolume', volume]);
+
   return (
     <Show when={currentSongData().current_song}>
-      <section aria-label="Player controls" class="relative w-full">
-        <div
+      <section aria-label="Player controls" class="w-full">
+        <button
           role="slider"
           aria-orientation="horizontal"
           aria-valuemin={0}
@@ -88,7 +118,7 @@ const Controls: Component = () => {
           aria-valuemax={currentSongDuration()}
           aria-label="Seek slider"
           aria-valuetext={`${currentMinutes()} minutes and ${currentSeconds()} seconds out of ${durationMinutes()} minutes and ${durationSeconds()} seconds`}
-          class="h-2 w-full cursor-pointer bg-primary-800"
+          class="block h-2 w-full cursor-pointer bg-primary-800"
           onClick={onSeek}
         >
           <div
@@ -96,37 +126,109 @@ const Controls: Component = () => {
               width: `${(currentTime() / currentSongDuration()) * 100}%`,
             }}
             class="h-2 bg-accent-600 transition-[width] duration-75"
-          ></div>
-        </div>
-        <div class="flex items-center gap-4 p-4">
-          <CoverArt
-            src={currentAlbum().cover_art}
-            class="h-14 w-14 rounded-xl"
           />
-          <div>
-            <p class="truncate font-bold">{currentSong().title}</p>
-            <p class="truncate">{currentArtist().name}</p>
+        </button>
+        <div class="grid grid-cols-[1fr,10.5rem,1fr] items-center gap-4 p-4">
+          <div class="flex gap-4 overflow-hidden">
+            <CoverArt
+              src={currentAlbum().cover_art}
+              class="h-14 w-14 rounded-xl"
+            />
+            <div class="overflow-hidden">
+              <p class="truncate font-bold">{currentSong().title}</p>
+              <p class="truncate">{currentArtist().name}</p>
+            </div>
           </div>
-          <div class="flex-1"></div>
-          <p>
-            {currentMinutes()}:{currentSeconds()} / {durationMinutes()}:
-            {durationSeconds()}
-          </p>
-        </div>
-        <div class="absolute inset-x-[calc(50vw_-_5.25rem)] inset-y-6 flex">
-          <Button class="rounded-r-none" onClick={previousSong}>
-            <SkipBack />
-          </Button>
-          <Button variant="light" class="rounded-none" onClick={togglePause}>
-            {currentSongData().paused_at ? (
-              <Play fill="currentColor" />
-            ) : (
-              <Pause fill="currentColor" />
-            )}
-          </Button>
-          <Button class="rounded-l-none" onClick={nextSong}>
-            <SkipForward />
-          </Button>
+          <div class="flex">
+            <Button
+              class="rounded-r-none"
+              onClick={previousSong}
+              aria-label="Previous Song"
+            >
+              <SkipBackIcon />
+            </Button>
+            <Button
+              variant="light"
+              class="rounded-none"
+              onClick={togglePause}
+              aria-label={currentSongData().paused_at ? 'Play' : 'Pause'}
+            >
+              {currentSongData().paused_at ? (
+                <PlayIcon fill="currentColor" />
+              ) : (
+                <PauseIcon fill="currentColor" />
+              )}
+            </Button>
+            <Button
+              class="rounded-l-none"
+              onClick={nextSong}
+              aria-label="Next Song"
+            >
+              <SkipForwardIcon />
+            </Button>
+          </div>
+          <div>
+            <p class="relative -top-2 text-right text-sm">
+              {currentMinutes()}:{currentSeconds()} / {durationMinutes()}:
+              {durationSeconds()}
+            </p>
+            <div class="flex justify-end gap-2">
+              <div class="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="small"
+                  aria-label="Toggle Mute"
+                  aria-pressed={currentSongData().volume === 0}
+                  onClick={() =>
+                    setVolume(currentSongData().volume === 0 ? 0.5 : 0)
+                  }
+                >
+                  <Switch>
+                    <Match when={currentSongData().volume > 0.5}>
+                      <Volume2Icon size={16} />
+                    </Match>
+                    <Match when={currentSongData().volume > 0}>
+                      <Volume1Icon size={16} />
+                    </Match>
+                    <Match when={currentSongData().volume === 0}>
+                      <VolumeXIcon size={16} />
+                    </Match>
+                  </Switch>
+                </Button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={currentSongData().volume}
+                  onInput={(e) => setVolume(parseFloat(e.currentTarget.value))}
+                />
+              </div>
+              <Button
+                variant={isShuffled() ? 'default' : 'ghost'}
+                size="small"
+                onClick={toggleShuffle}
+                aria-pressed={isShuffled()}
+                aria-label="Toggle Shuffle"
+              >
+                <ShuffleIcon size={16} />
+              </Button>
+              <Button
+                variant={repeatMode() !== 'None' ? 'default' : 'ghost'}
+                size="small"
+                aria-label={`Toggle Repeat: repeat ${repeatMode()}`}
+                aria-pressed={repeatMode() !== 'None'}
+                onClick={toggleRepeatMode}
+              >
+                <Show
+                  when={repeatMode() === 'One'}
+                  fallback={<RepeatIcon size={16} />}
+                >
+                  <Repeat1Icon size={16} />
+                </Show>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </Show>

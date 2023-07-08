@@ -26,6 +26,7 @@ struct CurrentSongData {
   current_song: Option<String>,
   song_started_at: u32,
   paused_at: Option<u32>,
+  volume: f64,
 }
 
 impl From<&Arc<Mutex<PlayerState>>> for CurrentSongData {
@@ -35,6 +36,7 @@ impl From<&Arc<Mutex<PlayerState>>> for CurrentSongData {
       current_song: state.current_song.clone(),
       song_started_at: state.song_started_at,
       paused_at: state.paused_at,
+      volume: state.volume,
     }
   }
 }
@@ -45,7 +47,7 @@ pub fn next_song(
   player: &Player,
   mut os_controls: &mut MediaControls,
 ) {
-  if let Some(current_song) = state.current_song.clone() {
+  if let Some(current_song) = &state.current_song {
     let next_song = state.next_songs.pop().or_else(|| {
       state
         .automatic_next_songs
@@ -58,11 +60,11 @@ pub fn next_song(
             state.automatic_next_songs = next_songs;
             next_song
           }),
-          RepeatMode::One => Some(current_song.clone()),
+          RepeatMode::One => Some(current_song.to_string()),
           RepeatMode::None => None,
         })
     });
-    state.previous_songs.push(current_song.clone());
+    state.previous_songs.push(current_song.to_string());
     state.current_song = None;
     if let Some(song_id) = &next_song {
       play_song(
@@ -112,12 +114,12 @@ pub fn play_song(
   player.play();
   if let Some(current_song) = &state.current_song {
     if save_to_prev {
-      state.previous_songs.push(current_song.clone());
+      state.previous_songs.push(current_song.to_string());
       if (state.previous_songs.len() as u32) > 20 {
         state.previous_songs.remove(0);
       }
     } else {
-      state.automatic_next_songs.push(current_song.clone());
+      state.automatic_next_songs.push(current_song.to_string());
     }
   }
   state.current_song = Some(song_id.to_string());
@@ -147,8 +149,8 @@ pub fn previous_song(
     return seek(state, player, 0);
   }
   if let Some(song_id) = state.previous_songs.pop() {
-    if let Some(song_id) = state.current_song.clone() {
-      state.automatic_next_songs.push(song_id);
+    if let Some(song_id) = &state.current_song {
+      state.automatic_next_songs.push(song_id.clone());
     }
     play_song(&song_id, library, player, state, os_controls, false);
   } else {
@@ -211,6 +213,37 @@ pub fn get_router() -> RouterBuilder<Context> {
           &ctx.player,
           &mut ctx.os_controls.lock().unwrap(),
         )
+      })
+    })
+    .mutation("toggleShuffle", |t| {
+      t(|ctx, _: ()| {
+        let mut state = ctx.player_state.lock().unwrap();
+        state.is_shuffled = !state.is_shuffled;
+        state.automatic_next_songs = get_automatic_next_songs(
+          &ctx.library.lock().unwrap(),
+          state.current_song.as_ref().unwrap(),
+          state.is_shuffled,
+          &state.scope,
+        );
+        state.is_shuffled
+      })
+    })
+    .mutation("toggleRepeatMode", |t| {
+      t(|ctx, _: ()| {
+        let mut state = ctx.player_state.lock().unwrap();
+        state.repeat_mode = match state.repeat_mode {
+          RepeatMode::None => RepeatMode::All,
+          RepeatMode::All => RepeatMode::One,
+          RepeatMode::One => RepeatMode::None,
+        };
+        state.repeat_mode.clone()
+      })
+    })
+    .query("getVolume", |t| t(|ctx, _: ()| ctx.player.volume()))
+    .mutation("setVolume", |t| {
+      t(|ctx, input: f64| {
+        ctx.player.set_volume(input);
+        input
       })
     })
     .subscription("currentSong", |t| {

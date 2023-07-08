@@ -1,5 +1,5 @@
 import { cx } from 'class-variance-authority';
-import { Music } from 'lucide-solid';
+import { MusicIcon } from 'lucide-solid';
 import { Show, type Component } from 'solid-js';
 
 const CoverArt: Component<{
@@ -16,7 +16,7 @@ const CoverArt: Component<{
             props.class
           )}
         >
-          <Music />
+          <MusicIcon />
         </div>
       }
     >

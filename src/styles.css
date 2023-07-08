@@ -28,6 +28,9 @@
   --color-accent-800: 6 95 70;
   --color-accent-900: 6 78 59;
   --color-accent-950: 2 44 34;
+
+  accent-color: rgb(var(--color-accent-600));
+  color-scheme: dark;
 }
 
 * {

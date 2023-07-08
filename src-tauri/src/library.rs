@@ -74,7 +74,7 @@ pub fn read_from_dirs(dirs: &Vec<PathBuf>) -> Library {
                   artists.insert(
                     id.clone(),
                     Artist {
-                      name: artist_name.clone(),
+                      name: artist_name.to_string(),
                     },
                   );
                   id
