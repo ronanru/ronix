@@ -19,6 +19,11 @@ const Welcome: Component = () => {
     });
   });
 
+  const addFolder = (folder: string | null) =>
+    folder &&
+    !folders().includes(folder) &&
+    setFolders((f) => [...f, folder as string]);
+
   return (
     <div class="m-6 w-full max-w-md space-y-4 rounded-2xl bg-primary-900 p-6 shadow-xl">
       <h1 class="text-2xl font-bold">Welcome to Ronix!</h1>
@@ -38,11 +43,7 @@ const Welcome: Component = () => {
         )}
       </For>
       <Button
-        onClick={async () => {
-          let folder = await api.query(['config.pickFolder']);
-          if (folder && !folders().includes(folder))
-            setFolders((f) => [...f, folder as string]);
-        }}
+        onClick={() => api.query(['config.pickFolder']).then(addFolder)}
         class="w-full"
       >
         <Plus />

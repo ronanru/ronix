@@ -1,10 +1,12 @@
 import { api } from '@/api';
 import { library } from '@/library';
-import { For, type Component } from 'solid-js';
-import CoverArt from './coverArt';
+import { For, Show, type Component } from 'solid-js';
+import CoverArt from '../components/coverArt';
 
 const SongList: Component<{
   songs?: string[];
+  isOnArtistPage?: boolean;
+  isOnAlbumPage?: boolean;
 }> = (props) => {
   const songs = () =>
     Object.entries(library()?.songs || {})
@@ -17,6 +19,8 @@ const SongList: Component<{
         return {
           ...song,
           id,
+          artist_id: album.artist,
+          album_id: song.album,
           album: album.name,
           artist: artist.name,
           cover_art: album.cover_art,
@@ -34,20 +38,32 @@ const SongList: Component<{
               api.mutation([
                 'player.playSong',
                 {
-                  scope: 'Library',
+                  scope: props.isOnArtistPage
+                    ? {
+                        Artist: song.artist_id,
+                      }
+                    : props.isOnAlbumPage
+                    ? {
+                        Album: song.album_id,
+                      }
+                    : 'Library',
                   song_id: song.id,
                 },
               ])
             }
             class="flex max-w-full items-center gap-4 rounded-xl p-4 transition-colors hover:bg-primary-900"
           >
-            <CoverArt
-              src={song.cover_art}
-              class="h-12 w-12 flex-shrink-0 rounded-lg"
-            />
+            <Show when={!props.isOnAlbumPage}>
+              <CoverArt
+                src={song.cover_art}
+                class="h-12 w-12 flex-shrink-0 rounded-lg"
+              />
+            </Show>
             <div class="flex-shrink flex-grow overflow-hidden text-left">
               <p class="truncate font-bold">{song.title}</p>
-              <p class="truncate">{song.artist}</p>
+              <Show when={!props.isOnArtistPage && !props.isOnAlbumPage}>
+                <button class="block truncate">{song.artist}</button>
+              </Show>
             </div>
             <p class="flex-shrink-0">
               {Math.floor(song.duration / 60)}:

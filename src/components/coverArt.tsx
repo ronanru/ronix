@@ -12,7 +12,7 @@ const CoverArt: Component<{
       fallback={
         <div
           class={cx(
-            'grid place-items-center bg-primary-800 transition-colors',
+            'grid aspect-square h-full place-items-center bg-primary-800 transition-colors',
             props.class
           )}
         >

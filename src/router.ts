@@ -1,14 +1,43 @@
 import { createSignal } from 'solid-js';
 
+export const MainPages = ['songs', 'artists', 'albums'] as const;
+
 type PageData =
   | {
-      name: 'songs' | 'artists' | 'albums';
+      name: (typeof MainPages)[number];
+      data?: undefined;
     }
   | {
       name: 'search';
-      query: string;
+      data: string;
+    }
+  | {
+      name: 'artist';
+      data: string;
+    }
+  | {
+      name: 'album';
+      data: string;
     };
 
-export const [currentPage, setCurrentPage] = createSignal<PageData>({
+const [currentPage, setCurrentPage] = createSignal<PageData>({
   name: 'songs',
 });
+
+let previousPages: PageData[] = [];
+
+export const goBack = () => {
+  setCurrentPage(
+    previousPages.pop() || {
+      name: 'songs',
+    }
+  );
+};
+
+export const navigate = (page: PageData) => {
+  if (MainPages.includes(page.name)) previousPages = [];
+  else previousPages.push(currentPage());
+  setCurrentPage(page);
+};
+
+export { currentPage };
