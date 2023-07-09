@@ -130,7 +130,11 @@ pub fn play_song(
       title: Some(&song.title),
       album: Some(&album.name),
       artist: Some(&artist.name),
-      cover_url: album.cover_art.as_deref(),
+      cover_url: album
+        .cover_art
+        .as_ref()
+        .map(|p| format!("file://{}", p))
+        .as_deref(),
       duration: Some(Duration::from_millis(song.duration as u64)),
     })
     .unwrap();

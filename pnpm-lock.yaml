@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@fontsource-variable/inter':
-    specifier: ^5.0.4
-    version: 5.0.4
+    specifier: ^5.0.5
+    version: 5.0.5
   '@rspc/client':
     specifier: ^0.1.3
     version: 0.1.3
@@ -24,8 +24,8 @@ dependencies:
     specifier: ^0.6.1
     version: 0.6.1
   lucide-solid:
-    specifier: ^0.258.0
-    version: 0.258.0(solid-js@1.7.7)
+    specifier: ^0.259.0
+    version: 0.259.0(solid-js@1.7.7)
   solid-js:
     specifier: ^1.7.7
     version: 1.7.7
@@ -38,8 +38,8 @@ devDependencies:
     specifier: ^0.4.2
     version: 0.4.2
   '@types/node':
-    specifier: ^20.4.0
-    version: 20.4.0
+    specifier: ^20.4.1
+    version: 20.4.1
   '@typescript-eslint/eslint-plugin':
     specifier: ^5.61.0
     version: 5.61.0(@typescript-eslint/parser@5.61.0)(eslint@8.44.0)(typescript@5.1.6)
@@ -77,11 +77,11 @@ devDependencies:
     specifier: ^5.1.6
     version: 5.1.6
   vite:
-    specifier: ^4.4.0
-    version: 4.4.0(@types/node@20.4.0)
+    specifier: ^4.4.2
+    version: 4.4.2(@types/node@20.4.1)
   vite-plugin-solid:
     specifier: ^2.7.0
-    version: 2.7.0(solid-js@1.7.7)(vite@4.4.0)
+    version: 2.7.0(solid-js@1.7.7)(vite@4.4.2)
 
 packages:
 
@@ -679,8 +679,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@fontsource-variable/inter@5.0.4:
-    resolution: {integrity: sha512-MYomT1JVwFAPhinw3N4mQbtwNCXSQ2n+W2JFCgXNyhzDL7hgAXzI89/yZRyNz5kYfyyG7pgsOj9YZ0aujlHbEw==}
+  /@fontsource-variable/inter@5.0.5:
+    resolution: {integrity: sha512-hmj/jffr+1tabEPmvm+/b89MtbO6hd5PVbQ6HoMGTO7RMF5eD2C9UcprCgZTOF3OWh5uC21C9HZGN0O9wxe+UQ==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -933,8 +933,8 @@ packages:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
     dev: true
 
-  /@types/node@20.4.0:
-    resolution: {integrity: sha512-jfT7iTf/4kOQ9S7CHV9BIyRaQqHu67mOjsIQBC3BKZvzvUB6zLxEwJ6sBE3ozcvP8kF6Uk5PXN0Q+c0dfhGX0g==}
+  /@types/node@20.4.1:
+    resolution: {integrity: sha512-JIzsAvJeA/5iY6Y/OxZbv1lUcc8dNSE77lb2gnBH+/PJ3lFR1Ccvgwl5JWnHAkNHcRsT0TbpVOsiMKZ1F/yyJg==}
     dev: true
 
   /@types/semver@7.5.0:
@@ -2245,8 +2245,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lucide-solid@0.258.0(solid-js@1.7.7):
-    resolution: {integrity: sha512-KFhdUL+yTtqbUPJ28fsT4YHjbEmLj4THYqBKg4Kj0P3o+lCvrKQOHaw/qAr982yfBQOPThVjmvJpreZCCvYBRA==}
+  /lucide-solid@0.259.0(solid-js@1.7.7):
+    resolution: {integrity: sha512-oMEQQYAzLXhBQnyF2alsC24hd8j6zStA7gbct6rIDk5NtChCWG6hp4erKRJoWsTBCKh00q4xt3sfnnLC32SAsg==}
     peerDependencies:
       solid-js: ^1.4.7
     dependencies:
@@ -2973,7 +2973,7 @@ packages:
     resolution: {integrity: sha512-hGdgQozCsQJMyfK5urgFcWEqsSSrK63Awe0t/IMR0bZ0QMtnuaiHzThW81guu3qx9abLi99NEuiaN6P9gVYsNg==}
     dev: true
 
-  /vite-plugin-solid@2.7.0(solid-js@1.7.7)(vite@4.4.0):
+  /vite-plugin-solid@2.7.0(solid-js@1.7.7)(vite@4.4.2):
     resolution: {integrity: sha512-avp/Jl5zOp/Itfo67xtDB2O61U7idviaIp4mLsjhCa13PjKNasz+IID0jYTyqUp9SFx6/PmBr6v4KgDppqompg==}
     peerDependencies:
       solid-js: ^1.7.2
@@ -2986,14 +2986,14 @@ packages:
       merge-anything: 5.1.7
       solid-js: 1.7.7
       solid-refresh: 0.5.3(solid-js@1.7.7)
-      vite: 4.4.0(@types/node@20.4.0)
-      vitefu: 0.2.4(vite@4.4.0)
+      vite: 4.4.2(@types/node@20.4.1)
+      vitefu: 0.2.4(vite@4.4.2)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite@4.4.0(@types/node@20.4.0):
-    resolution: {integrity: sha512-Wf+DCEjuM8aGavEYiF77hnbxEZ+0+/jC9nABR46sh5Xi+GYeSvkeEFRiVuI3x+tPjxgZeS91h1jTAQTPFgePpA==}
+  /vite@4.4.2(@types/node@20.4.1):
+    resolution: {integrity: sha512-zUcsJN+UvdSyHhYa277UHhiJ3iq4hUBwHavOpsNUGsTgjBeoBlK8eDt+iT09pBq0h9/knhG/SPrZiM7cGmg7NA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -3020,7 +3020,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.4.0
+      '@types/node': 20.4.1
       esbuild: 0.18.11
       postcss: 8.4.25
       rollup: 3.26.2
@@ -3028,7 +3028,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitefu@0.2.4(vite@4.4.0):
+  /vitefu@0.2.4(vite@4.4.2):
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0
@@ -3036,7 +3036,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.4.0(@types/node@20.4.0)
+      vite: 4.4.2(@types/node@20.4.1)
     dev: true
 
   /which-boxed-primitive@1.0.2:
