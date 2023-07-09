@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js';
 
-export const MainPages = ['songs', 'artists', 'albums'] as const;
+export const MainPages = ['songs', 'artists', 'albums', 'search'] as const;
 
 type PageData =
   | {

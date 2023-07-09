@@ -3,16 +3,20 @@ import { navigate } from '@/router';
 import { For, type Component } from 'solid-js';
 
 const ArtistList: Component<{
-  artists?: string[];
+  ids?: string[];
+  noSort?: boolean;
 }> = (props) => {
-  const artists = () =>
-    Object.entries(library()?.artists || {})
-      .filter(([id]) => !props.artists || props.artists.includes(id))
-      .map(([id, artist]) => ({
-        id,
-        ...artist,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+  const artists = () => {
+    let entries = Object.entries(library()?.artists || {});
+    if (props.ids) entries = entries.filter(([id]) => props.ids!.includes(id));
+    let artists = entries.map(([id, artist]) => ({
+      id,
+      ...artist,
+    }));
+    if (!props.noSort)
+      artists = artists.sort((a, b) => a.name.localeCompare(b.name));
+    return artists;
+  };
 
   return (
     <div class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4">

@@ -161,7 +161,7 @@ pub fn previous_song(
 
 pub fn seek(state: &mut PlayerState, player: &Player, seek_to: u32) {
   player.seek(ClockTime::from_seconds(seek_to as u64));
-  state.song_started_at = get_current_time() - seek_to;
+  state.song_started_at = state.paused_at.unwrap_or(get_current_time()) - seek_to;
 }
 
 pub fn get_router() -> RouterBuilder<Context> {
@@ -239,7 +239,6 @@ pub fn get_router() -> RouterBuilder<Context> {
         state.repeat_mode.clone()
       })
     })
-    .query("getVolume", |t| t(|ctx, _: ()| ctx.player.volume()))
     .mutation("setVolume", |t| {
       t(|ctx, input: f64| {
         ctx.player.set_volume(input);

@@ -6,7 +6,7 @@ export type Procedures = {
         { key: "config.getDefaultMusicFolder", input: never, result: string } | 
         { key: "config.pickFolder", input: never, result: string | null } | 
         { key: "library.get", input: never, result: Library } | 
-        { key: "player.getVolume", input: never, result: number },
+        { key: "library.search", input: string, result: SearchResults },
     mutations: 
         { key: "config.set", input: Config, result: null } | 
         { key: "player.nextSong", input: never, result: null } | 
@@ -25,16 +25,18 @@ export type RepeatMode = "None" | "One" | "All"
 
 export type PlaySongInput = { song_id: string; scope: PlayerScope }
 
-export type Config = { music_folders: string[] }
+export type Artist = { name: string }
 
-export type Song = { title: string; path: string; duration: number; album: string }
+export type Config = { music_folders: string[] }
 
 export type Library = { artists: { [key: string]: Artist }; albums: { [key: string]: Album }; songs: { [key: string]: Song } }
 
+export type Song = { title: string; path: string; duration: number; album: string }
+
 export type CurrentSongData = { current_song: string | null; song_started_at: number; paused_at: number | null; volume: number }
 
-export type Artist = { name: string }
+export type Album = { name: string; cover_art: string | null; artist: string }
 
 export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
-export type Album = { name: string; cover_art: string | null; artist: string }
+export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }

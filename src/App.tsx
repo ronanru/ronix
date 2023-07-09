@@ -1,3 +1,4 @@
+import { debounce } from '@solid-primitives/scheduled';
 import { ChevronLeftIcon, Search } from 'lucide-solid';
 import {
   For,
@@ -6,6 +7,7 @@ import {
   Suspense,
   Switch,
   lazy,
+  onCleanup,
   type Component,
 } from 'solid-js';
 import Controls from './components/controls';
@@ -17,11 +19,32 @@ import AlbumPage from './views/albumPage';
 import ArtistPage from './views/artistPage';
 import ArtistList from './views/artistsList';
 import Loading from './views/loading';
+import SearchPage from './views/searchPage';
 import SongList from './views/songList';
 
 const Welcome = lazy(() => import('./views/welcome'));
 
 const App: Component = () => {
+  const setSearch = debounce(
+    (data: string) =>
+      navigate({
+        name: 'search',
+        data,
+      }),
+    250
+  );
+
+  const onSearchBarInput = (e: Event & { currentTarget: HTMLInputElement }) => {
+    const query = e.currentTarget.value;
+    if (query) setSearch(query);
+    else {
+      setSearch.clear();
+      goBack();
+    }
+  };
+
+  onCleanup(() => setSearch.clear());
+
   return (
     <Suspense fallback={<Loading />}>
       <Show fallback={<Welcome />} when={config()?.music_folders.length}>
@@ -37,6 +60,7 @@ const App: Component = () => {
               type="text"
               class="rounded-lg bg-transparent px-4 py-2 caret-accent-600 focus-visible:outline-none"
               placeholder="Search"
+              onInput={onSearchBarInput}
             />
           </div>
         </header>
@@ -78,6 +102,9 @@ const App: Component = () => {
               </Match>
               <Match when={currentPage().name === 'album'}>
                 <AlbumPage albumId={currentPage().data as string} />
+              </Match>
+              <Match when={currentPage().name === 'search'}>
+                <SearchPage query={currentPage().data as string} />
               </Match>
             </Switch>
           </div>

@@ -808,6 +808,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fuse-rust"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a73d266f03bfb9c4c783e17223a2c2deaddfcf311cb548b6189041bc37067c0"
+
+[[package]]
 name = "futf"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2556,6 +2562,7 @@ version = "0.0.0"
 dependencies = [
  "async-stream",
  "directories",
+ "fuse-rust",
  "gstreamer",
  "gstreamer-player",
  "lofty",

@@ -80,11 +80,9 @@ async fn main() {
   gst::init().unwrap();
 
   let router = Router::<Context>::new()
-    .query("library.get", |t| {
-      t(|ctx, _input: ()| ctx.library.lock().unwrap().clone())
-    })
     .merge("config.", config::get_router())
     .merge("player.", player::get_router())
+    .merge("library.", library::get_router())
     .config(RspcConfig::new().export_ts_bindings("../src/gen/tauri-types.ts"))
     .build();
 

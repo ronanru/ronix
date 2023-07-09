@@ -6,6 +6,8 @@ import CoverArt from '../components/coverArt';
 const SongList: Component<{
   albums?: string[];
   album?: string;
+  ids?: string[];
+  noSort?: boolean;
 }> = (props) => {
   const songs = () => {
     let entries = Object.entries(library()?.songs || {});
@@ -15,7 +17,9 @@ const SongList: Component<{
       );
     else if (props.album)
       entries = entries.filter(([, song]) => song.album === props.album);
-    return entries.map(([id, song]) => {
+    else if (props.ids)
+      entries = entries.filter(([id]) => props.ids!.includes(id));
+    let songs = entries.map(([id, song]) => {
       const album = library()!.albums[song.album]!;
       const artist = library()!.artists[album.artist]!;
       return {
@@ -27,6 +31,9 @@ const SongList: Component<{
         id,
       };
     });
+    if (!props.noSort)
+      songs = songs.sort((a, b) => a.title.localeCompare(b.title));
+    return songs;
   };
 
   return (

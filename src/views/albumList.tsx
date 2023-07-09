@@ -5,22 +5,26 @@ import CoverArt from '../components/coverArt';
 
 const AlbumList: Component<{
   artist?: string;
+  ids?: string[];
+  noSort?: boolean;
 }> = (props) => {
   const albums = () => {
     let entries = Object.entries(library()?.albums || {});
     if (props.artist)
       entries = entries.filter(([, album]) => album.artist === props.artist);
-    return entries
-      .map(([id, album]) => {
-        const artist = library()!.artists[album.artist]!;
-        return {
-          ...album,
-          id,
-          artist: artist.name,
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.name.localeCompare(b.name));
+    else if (props.ids)
+      entries = entries.filter(([id]) => props.ids!.includes(id));
+    let albums = entries.map(([id, album]) => {
+      const artist = library()!.artists[album.artist]!;
+      return {
+        ...album,
+        id,
+        artist: artist.name,
+      };
+    });
+    if (!props.noSort)
+      albums = albums.sort((a, b) => a.name.localeCompare(b.name));
+    return albums;
   };
 
   return (

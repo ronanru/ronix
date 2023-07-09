@@ -1,8 +1,9 @@
-use crate::PlayerScope;
+use crate::{Context, PlayerScope};
+use fuse_rust::Fuse;
 use lofty::{Accessor, AudioFile, MimeType, Probe, TaggedFileExt};
 use nanoid::nanoid;
 use rand::prelude::*;
-use rspc::Type;
+use rspc::{Router, RouterBuilder, Type};
 use serde::Serialize;
 use std::{
   collections::HashMap,
@@ -177,4 +178,54 @@ pub fn get_automatic_next_songs(
   songs_vec.rotate_left(current_song_index);
   songs_vec.remove(0);
   songs_vec.iter().map(|(id, _)| id).cloned().collect()
+}
+
+#[derive(Serialize, Type)]
+struct SearchResults {
+  artists: Vec<String>,
+  albums: Vec<String>,
+  songs: Vec<String>,
+}
+
+pub fn get_router() -> RouterBuilder<Context> {
+  Router::<Context>::new()
+    .query("get", |t| {
+      t(|ctx, _input: ()| ctx.library.lock().unwrap().clone())
+    })
+    .query("search", |t| {
+      t(|ctx, query: String| {
+        let library = ctx.library.lock().unwrap();
+        let fuse = Fuse {
+          location: 0,
+          distance: 100,
+          threshold: 0.3,
+          max_pattern_length: 32,
+          is_case_sensitive: false,
+          tokenize: false,
+        };
+        let artists: Vec<String> = fuse
+          .search_text_in_iterable(
+            &query,
+            library.artists.iter().map(|(_, artist)| &artist.name),
+          )
+          .iter()
+          .map(|a| library.artists.iter().nth(a.index).unwrap().0.to_string())
+          .collect();
+        let albums: Vec<String> = fuse
+          .search_text_in_iterable(&query, library.albums.iter().map(|(_, album)| &album.name))
+          .iter()
+          .map(|a| library.albums.iter().nth(a.index).unwrap().0.to_string())
+          .collect();
+        let songs: Vec<String> = fuse
+          .search_text_in_iterable(&query, library.songs.iter().map(|(_, song)| &song.title))
+          .iter()
+          .map(|a| library.songs.iter().nth(a.index).unwrap().0.to_string())
+          .collect();
+        SearchResults {
+          artists,
+          albums,
+          songs,
+        }
+      })
+    })
 }
