@@ -1,6 +1,11 @@
-# Ronix Music Player
+<h1>
+  <img src="app-icon.svg" alt="">
+  Ronix Music Player
+</h1>
 
 All linux music players suck, so I am making my own
+
+![Screenshot](./screenshot.png)
 
 ## Features Roadmap
 

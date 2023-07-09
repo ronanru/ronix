@@ -41,9 +41,9 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "ronix",
+        "title": "Ronix Music Player",
         "width": 800,
-        "height": 600
+        "height": 1000
       }
     ]
   }
