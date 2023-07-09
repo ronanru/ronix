@@ -4,15 +4,15 @@ import { For, Show, type Component } from 'solid-js';
 import CoverArt from '../components/coverArt';
 
 const AlbumList: Component<{
-  albums?: string[];
-  isOnArtistPage?: boolean;
+  artist?: string;
 }> = (props) => {
-  const albums = () =>
-    Object.entries(library()?.albums || {})
-      .filter(([id]) => !props.albums || props.albums.includes(id))
+  const albums = () => {
+    let entries = Object.entries(library()?.albums || {});
+    if (props.artist)
+      entries = entries.filter(([, album]) => album.artist === props.artist);
+    return entries
       .map(([id, album]) => {
-        const artist = library()?.artists[album.artist];
-        if (!artist) return null;
+        const artist = library()!.artists[album.artist]!;
         return {
           ...album,
           id,
@@ -21,6 +21,7 @@ const AlbumList: Component<{
       })
       .filter(Boolean)
       .sort((a, b) => a.name.localeCompare(b.name));
+  };
 
   return (
     <div class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4">
@@ -41,7 +42,7 @@ const AlbumList: Component<{
           >
             <CoverArt src={album.cover_art} class="rounded-2xl" />
             <p class="truncate text-center font-bold">{album.name}</p>
-            <Show when={!props.isOnArtistPage}>
+            <Show when={!props.artist}>
               <button
                 role="link"
                 class="block truncate text-center"

@@ -1,13 +1,17 @@
-use base64::{engine::general_purpose, Engine as _};
-use lofty::{Accessor, AudioFile, Probe, TaggedFileExt};
+use crate::PlayerScope;
+use lofty::{Accessor, AudioFile, MimeType, Probe, TaggedFileExt};
 use nanoid::nanoid;
 use rand::prelude::*;
 use rspc::Type;
 use serde::Serialize;
-use std::{collections::HashMap, hash::Hash, path::PathBuf};
+use std::{
+  collections::HashMap,
+  fs::{self, create_dir_all, File},
+  hash::Hash,
+  io::Write,
+  path::PathBuf,
+};
 use walkdir::WalkDir;
-
-use crate::PlayerScope;
 
 #[derive(Serialize, Clone, Type, Hash)]
 pub struct Artist {
@@ -40,6 +44,9 @@ pub fn read_from_dirs(dirs: &Vec<PathBuf>) -> Library {
   let mut artists: HashMap<String, Artist> = HashMap::new();
   let mut albums: HashMap<String, Album> = HashMap::new();
   let mut songs: HashMap<String, Song> = HashMap::new();
+
+  let temp_dir = std::env::temp_dir().join("ronix-covers");
+  create_dir_all(&temp_dir).unwrap();
 
   for dir in dirs.iter() {
     for file_res in WalkDir::new(dir) {
@@ -87,19 +94,30 @@ pub fn read_from_dirs(dirs: &Vec<PathBuf>) -> Library {
                 Some(album) => album.0.clone(),
                 None => {
                   let id = nanoid!();
+                  let cover_art = if tags.picture_count() > 0 {
+                    let path =
+                      temp_dir
+                        .join(&id)
+                        .with_extension(match tags.pictures()[0].mime_type() {
+                          MimeType::Bmp => "bmp",
+                          MimeType::Jpeg => "jpg",
+                          MimeType::Png => "png",
+                          MimeType::Tiff => "tiff",
+                          MimeType::Unknown(t) => t.split('/').last().unwrap(),
+                          _ => "jpg",
+                        });
+                    let mut file = File::create(&path).unwrap();
+                    file.write_all(tags.pictures()[0].data()).unwrap();
+                    fs::write(&path, tags.pictures()[0].data()).unwrap();
+                    Some(path.to_str().unwrap().to_string())
+                  } else {
+                    None
+                  };
                   albums.insert(
                     id.clone(),
                     Album {
                       name: album_name,
-                      cover_art: if tags.picture_count() > 0 {
-                        Some(format!(
-                          "data:{};base64,{}",
-                          &tags.pictures()[0].mime_type().to_string(),
-                          general_purpose::URL_SAFE.encode(tags.pictures()[0].data())
-                        ))
-                      } else {
-                        None
-                      },
+                      cover_art,
                       artist: artist_id,
                     },
                   );

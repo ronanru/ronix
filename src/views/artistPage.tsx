@@ -9,21 +9,17 @@ const ArtistPage: Component<{ artistId: string }> = (props) => {
     Object.entries(library()?.albums || {})
       .filter(([, album]) => album.artist === props.artistId)
       .map(([id]) => id);
-  const songs = () =>
-    Object.entries(library()?.songs || {})
-      .filter(([, song]) => albums().includes(song.album))
-      .map(([id]) => id);
 
   return (
     <div>
       <h1 class="mt-16 text-5xl font-bold">{artist()?.name}</h1>
       <section aria-label="Albums" class="mt-8">
         <h2 class="mb-4 text-2xl font-bold">Albums</h2>
-        <AlbumList albums={albums()} isOnArtistPage />
+        <AlbumList artist={props.artistId} />
       </section>
       <section aria-label="Songs" class="mt-8">
         <h2 class="mb-4 text-2xl font-bold">Songs</h2>
-        <SongList songs={songs()} isOnArtistPage />
+        <SongList albums={albums()} />
       </section>
     </div>
   );

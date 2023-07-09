@@ -1,3 +1,4 @@
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { cx } from 'class-variance-authority';
 import { MusicIcon } from 'lucide-solid';
 import { Show, type Component } from 'solid-js';
@@ -20,7 +21,11 @@ const CoverArt: Component<{
         </div>
       }
     >
-      <img src={props.src as string} alt="" class={props.class} />
+      <img
+        src={convertFileSrc(props.src as string)}
+        alt=""
+        class={props.class}
+      />
     </Show>
   );
 };

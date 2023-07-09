@@ -4,30 +4,30 @@ import { For, Show, type Component } from 'solid-js';
 import CoverArt from '../components/coverArt';
 
 const SongList: Component<{
-  songs?: string[];
-  isOnArtistPage?: boolean;
-  isOnAlbumPage?: boolean;
+  albums?: string[];
+  album?: string;
 }> = (props) => {
-  const songs = () =>
-    Object.entries(library()?.songs || {})
-      .filter(([id]) => !props.songs || props.songs.includes(id))
-      .map(([id, song]) => {
-        const album = library()?.albums[song.album];
-        if (!album) return null;
-        const artist = library()?.artists[album.artist];
-        if (!artist) return null;
-        return {
-          ...song,
-          id,
-          artist_id: album.artist,
-          album_id: song.album,
-          album: album.name,
-          artist: artist.name,
-          cover_art: album.cover_art,
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.title.localeCompare(b.title));
+  const songs = () => {
+    let entries = Object.entries(library()?.songs || {});
+    if (props.albums)
+      entries = entries.filter(([, song]) =>
+        props.albums!.includes(song.album)
+      );
+    else if (props.album)
+      entries = entries.filter(([, song]) => song.album === props.album);
+    return entries.map(([id, song]) => {
+      const album = library()!.albums[song.album]!;
+      const artist = library()!.artists[album.artist]!;
+      return {
+        ...song,
+        album_id: song.album,
+        artist_id: album.artist,
+        cover_art: album.cover_art,
+        artist: artist.name,
+        id,
+      };
+    });
+  };
 
   return (
     <div class="flex flex-col overflow-x-hidden">
@@ -38,11 +38,11 @@ const SongList: Component<{
               api.mutation([
                 'player.playSong',
                 {
-                  scope: props.isOnArtistPage
+                  scope: props.albums
                     ? {
                         Artist: song.artist_id,
                       }
-                    : props.isOnAlbumPage
+                    : props.album
                     ? {
                         Album: song.album_id,
                       }
@@ -53,7 +53,7 @@ const SongList: Component<{
             }
             class="flex max-w-full items-center gap-4 rounded-xl p-4 transition-colors hover:bg-primary-900"
           >
-            <Show when={!props.isOnAlbumPage}>
+            <Show when={!props.album}>
               <CoverArt
                 src={song.cover_art}
                 class="h-12 w-12 flex-shrink-0 rounded-lg"
@@ -61,7 +61,7 @@ const SongList: Component<{
             </Show>
             <div class="flex-shrink flex-grow overflow-hidden text-left">
               <p class="truncate font-bold">{song.title}</p>
-              <Show when={!props.isOnArtistPage && !props.isOnAlbumPage}>
+              <Show when={!props.albums && !props.album}>
                 <button class="block truncate">{song.artist}</button>
               </Show>
             </div>

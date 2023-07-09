@@ -1,21 +1,18 @@
 import { library } from '@/library';
 import { navigate } from '@/router';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { Show, type Component } from 'solid-js';
 import SongList from './songList';
 
 const AlbumPage: Component<{ albumId: string }> = (props) => {
   const album = () => library()?.albums[props.albumId];
-  const songs = () =>
-    Object.entries(library()?.songs || {})
-      .filter(([, song]) => song.album === props.albumId)
-      .map(([id]) => id);
   const artist = () => library()?.artists[album()?.artist as string];
 
   return (
     <div>
       <Show when={album()?.cover_art}>
         <img
-          src={album()?.cover_art as string}
+          src={convertFileSrc(album()?.cover_art as string)}
           alt=""
           class="h-64 w-full rounded-lg object-cover object-center"
         />
@@ -46,7 +43,7 @@ const AlbumPage: Component<{ albumId: string }> = (props) => {
       </p>
       <section aria-label="Songs" class="mt-8">
         <h2 class="text-2xl font-bold">Songs</h2>
-        <SongList songs={songs()} isOnAlbumPage />
+        <SongList album={props.albumId} />
       </section>
     </div>
   );

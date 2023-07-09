@@ -25,7 +25,7 @@ const App: Component = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Show fallback={<Welcome />} when={config()?.music_folders.length}>
-        <div class="flex w-full gap-4 p-4">
+        <header class="flex w-full gap-4 p-4">
           <Show when={!MainPages.includes(currentPage().name)}>
             <Button role="link" onClick={goBack} aria-label="Back to songs">
               <ChevronLeftIcon />
@@ -39,7 +39,7 @@ const App: Component = () => {
               placeholder="Search"
             />
           </div>
-        </div>
+        </header>
         <Show
           when={['songs', 'albums', 'artists'].includes(currentPage().name)}
         >
@@ -61,25 +61,27 @@ const App: Component = () => {
             </For>
           </div>
         </Show>
-        <div class="w-full flex-1 overflow-y-auto px-4">
-          <Switch>
-            <Match when={currentPage().name === 'songs'}>
-              <SongList />
-            </Match>
-            <Match when={currentPage().name === 'albums'}>
-              <AlbumList />
-            </Match>
-            <Match when={currentPage().name === 'artists'}>
-              <ArtistList />
-            </Match>
-            <Match when={currentPage().name === 'artist'}>
-              <ArtistPage artistId={currentPage().data as string} />
-            </Match>
-            <Match when={currentPage().name === 'album'}>
-              <AlbumPage albumId={currentPage().data as string} />
-            </Match>
-          </Switch>
-        </div>
+        <main class="w-full flex-1 overflow-y-auto px-4">
+          <div class="mb-2">
+            <Switch>
+              <Match when={currentPage().name === 'songs'}>
+                <SongList />
+              </Match>
+              <Match when={currentPage().name === 'albums'}>
+                <AlbumList />
+              </Match>
+              <Match when={currentPage().name === 'artists'}>
+                <ArtistList />
+              </Match>
+              <Match when={currentPage().name === 'artist'}>
+                <ArtistPage artistId={currentPage().data as string} />
+              </Match>
+              <Match when={currentPage().name === 'album'}>
+                <AlbumPage albumId={currentPage().data as string} />
+              </Match>
+            </Switch>
+          </div>
+        </main>
         <Controls />
       </Show>
     </Suspense>

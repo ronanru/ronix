@@ -13,9 +13,10 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
+      "protocol": {
         "all": false,
-        "open": true
+        "asset": true,
+        "assetScope": ["**/*"]
       }
     },
     "bundle": {
@@ -34,7 +35,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     },
     "windows": [
       {
