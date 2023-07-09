@@ -7,6 +7,10 @@ All linux music players suck, so I am making my own
 
 ![Screenshot](./screenshot.png)
 
+## Download
+
+Download Ronix AppImage from the [releases page](https://github.com/ronanru/ronix/releases).
+
 ## Features Roadmap
 
 - [x] Plays music (All traditional music player features)
