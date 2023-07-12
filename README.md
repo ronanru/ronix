@@ -15,7 +15,7 @@ Download Ronix AppImage from the [releases page](https://github.com/ronanru/roni
 
 - [x] Plays music (All traditional music player features)
 - [x] Fuzzy search
-- [ ] Multiple themes
+- [x] Multiple themes
 - [ ] Song manager (Ability to edit song tags, delete songs)
 - [ ] Song downloader with yt-dlp
 - [ ] Publish on flathub, the AUR
