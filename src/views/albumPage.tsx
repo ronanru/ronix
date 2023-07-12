@@ -42,7 +42,7 @@ const AlbumPage: Component<{ albumId: string }> = (props) => {
         </button>
       </p>
       <section aria-label="Songs" class="mt-8">
-        <h2 class="text-2xl font-bold">Songs</h2>
+        <h2 class="mb-4 text-2xl font-bold">Songs</h2>
         <SongList album={props.albumId} />
       </section>
     </div>
