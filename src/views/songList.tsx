@@ -1,7 +1,7 @@
 import { api } from '@/api';
 import { library } from '@/library';
-import { For, Show, type Component } from 'solid-js';
-import CoverArt from '../components/coverArt';
+import SongButton from '@/songButton';
+import { For, type Component } from 'solid-js';
 
 const SongList: Component<{
   albums?: string[];
@@ -40,7 +40,11 @@ const SongList: Component<{
     <div class="flex flex-col overflow-x-hidden">
       <For each={songs()} fallback={<p class="text-center">No songs found</p>}>
         {(song) => (
-          <button
+          <SongButton
+            {...song}
+            noArtist={!!props.albums || !!props.album}
+            noCoverArt={!!props.album}
+            coverArt={song.cover_art}
             onClick={() =>
               api.mutation([
                 'player.playSong',
@@ -58,25 +62,7 @@ const SongList: Component<{
                 },
               ])
             }
-            class="flex max-w-full items-center gap-4 rounded-xl p-4 transition-colors hover:bg-primary-900"
-          >
-            <Show when={!props.album}>
-              <CoverArt
-                src={song.cover_art}
-                class="h-12 w-12 flex-shrink-0 rounded-lg"
-              />
-            </Show>
-            <div class="flex-shrink flex-grow overflow-hidden text-left">
-              <p class="truncate font-bold">{song.title}</p>
-              <Show when={!props.albums && !props.album}>
-                <button class="block truncate">{song.artist}</button>
-              </Show>
-            </div>
-            <p class="flex-shrink-0">
-              {Math.floor(song.duration / 60)}:
-              {(song.duration % 60).toString().padStart(2, '0')}
-            </p>
-          </button>
+          />
         )}
       </For>
     </div>

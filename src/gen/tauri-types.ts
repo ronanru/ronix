@@ -27,7 +27,7 @@ export type PlaySongInput = { song_id: string; scope: PlayerScope }
 
 export type Artist = { name: string }
 
-export type Config = { music_folders: string[] }
+export type MainColor = "Slate" | "Gray" | "Zinc" | "Neutral" | "Stone"
 
 export type Library = { artists: { [key: string]: Artist }; albums: { [key: string]: Album }; songs: { [key: string]: Song } }
 
@@ -39,4 +39,8 @@ export type Album = { name: string; cover_art: string | null; artist: string }
 
 export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
+export type Config = { music_folders: string[]; dark_mode: boolean; main_color: MainColor; accent_color: AccentColor }
+
 export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }
+
+export type AccentColor = "Red" | "Orange" | "Amber" | "Yellow" | "Lime" | "Green" | "Emerald" | "Teal" | "Cyan" | "Blue" | "Indigo" | "Violet" | "Purple" | "Fuchsia" | "Pink" | "Rose"

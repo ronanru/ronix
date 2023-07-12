@@ -1,25 +1,27 @@
 import { debounce } from '@solid-primitives/scheduled';
-import { ChevronLeftIcon, Search } from 'lucide-solid';
+import { ChevronLeftIcon, Search, SettingsIcon } from 'lucide-solid';
 import {
   For,
   Match,
   Show,
   Suspense,
   Switch,
+  createEffect,
   lazy,
   onCleanup,
   type Component,
 } from 'solid-js';
 import Controls from './components/controls';
 import Button from './components/ui/button';
-import { config } from './config';
-import { MainPages, currentPage, goBack, navigate } from './router';
+import { config, generateCssVariables } from './config';
+import { currentPage, goBack, navigate } from './router';
 import AlbumList from './views/albumList';
 import AlbumPage from './views/albumPage';
 import ArtistPage from './views/artistPage';
 import ArtistList from './views/artistsList';
 import Loading from './views/loading';
 import SearchPage from './views/searchPage';
+import Settings from './views/settings';
 import SongList from './views/songList';
 
 const Welcome = lazy(() => import('./views/welcome'));
@@ -43,31 +45,80 @@ const App: Component = () => {
     }
   };
 
+  createEffect(() => {
+    const conf = config();
+    if (!conf) return;
+    const cssVars = generateCssVariables(
+      conf.main_color,
+      conf.accent_color,
+      conf.dark_mode
+    );
+    for (const key in cssVars) {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      if (key.startsWith('--'))
+        document.documentElement.style.setProperty(
+          key,
+          cssVars[key as any] as any
+        );
+      else
+        document.documentElement.style[key as any] = cssVars[key as any] as any;
+      /* eslint-enable */
+    }
+  });
+
   onCleanup(() => setSearch.clear());
 
   return (
     <Suspense fallback={<Loading />}>
       <Show fallback={<Welcome />} when={config()?.music_folders.length}>
-        <header class="flex w-full gap-4 p-4">
-          <Show when={!MainPages.includes(currentPage().name)}>
+        <header class="flex w-full items-center gap-4 p-4">
+          <Show
+            when={
+              !['songs', 'albums', 'artists', 'search'].includes(
+                currentPage().name
+              )
+            }
+          >
             <Button role="link" onClick={goBack} aria-label="Back to songs">
               <ChevronLeftIcon />
             </Button>
           </Show>
-          <div class="flex w-full items-center rounded-lg bg-primary-800 focus-within:outline-accent-600">
-            <Search class="ml-2" />
-            <input
-              type="text"
-              class="rounded-lg bg-transparent px-4 py-2 caret-accent-600 focus-visible:outline-none"
-              placeholder="Search"
-              onInput={onSearchBarInput}
-            />
-          </div>
+          <Show
+            when={currentPage().name !== 'settings'}
+            fallback={
+              <h1 class="flex-1 text-4xl font-bold capitalize">
+                {currentPage().name}
+              </h1>
+            }
+          >
+            <div class="flex w-full items-center rounded-lg bg-primary-800 focus-within:outline-accent-600">
+              <Search class="ml-2" />
+              <input
+                type="text"
+                class="w-full rounded-lg bg-transparent px-4 py-2 caret-accent-600 focus-visible:outline-none"
+                placeholder="Search"
+                onInput={onSearchBarInput}
+              />
+            </div>
+          </Show>
+          <Show when={currentPage().name !== 'settings'}>
+            <Button
+              role="link"
+              size="icon"
+              onClick={() =>
+                navigate({
+                  name: 'settings',
+                })
+              }
+            >
+              <SettingsIcon />
+            </Button>
+          </Show>
         </header>
         <Show
           when={['songs', 'albums', 'artists'].includes(currentPage().name)}
         >
-          <div class="mb-4 grid w-full grid-cols-3 gap-4 px-4">
+          <nav class="mb-4 grid w-full grid-cols-3 gap-4 px-4">
             <For each={['songs', 'albums', 'artists'] as const}>
               {(name) => (
                 <Button
@@ -83,7 +134,7 @@ const App: Component = () => {
                 </Button>
               )}
             </For>
-          </div>
+          </nav>
         </Show>
         <main class="w-full flex-1 overflow-y-auto px-4">
           <div class="mb-2">
@@ -105,6 +156,9 @@ const App: Component = () => {
               </Match>
               <Match when={currentPage().name === 'search'}>
                 <SearchPage query={currentPage().data as string} />
+              </Match>
+              <Match when={currentPage().name === 'settings'}>
+                <Settings />
               </Match>
             </Switch>
           </div>

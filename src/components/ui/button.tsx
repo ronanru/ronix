@@ -14,6 +14,7 @@ const buttonVariants = cva(
       size: {
         small: 'text-sm px-2 py-1 rounded-md font-medium gap-2',
         default: 'px-4 py-2 rounded-lg font-semibold gap-4',
+        icon: 'p-2 rounded-lg',
       },
     },
     defaultVariants: {
@@ -38,6 +39,7 @@ const Button: Component<
 
   return (
     <button
+      type="button"
       {...btnProps}
       class={buttonVariants({
         size: local.size,

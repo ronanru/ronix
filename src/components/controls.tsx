@@ -107,10 +107,55 @@ const Controls: Component = () => {
   const setVolume = (volume: number) =>
     api.mutation(['player.setVolume', volume]);
 
+  const onSliderKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowLeft':
+      case 'ArrowDown':
+      case 'l':
+      case 'j':
+        api.mutation([
+          'player.seek',
+          Math.max(0, Math.floor(currentTime() / 1000) - 5),
+        ]);
+        break;
+      case 'ArrowRight':
+      case 'ArrowUp':
+      case 'h':
+      case 'k':
+        api.mutation([
+          'player.seek',
+          Math.min(currentSongDuration(), Math.floor(currentTime() / 1000) + 5),
+        ]);
+        break;
+      case 'Home':
+        api.mutation(['player.seek', 0]);
+        break;
+      case 'End':
+        nextSong();
+        break;
+      case 'PageUp':
+        api.mutation([
+          'player.seek',
+          Math.max(0, Math.floor(currentTime() / 1000) - 30),
+        ]);
+        break;
+      case 'PageDown':
+        api.mutation([
+          'player.seek',
+          Math.min(
+            currentSongDuration(),
+            Math.floor(currentTime() / 1000) + 30
+          ),
+        ]);
+        break;
+    }
+  };
+
   return (
     <Show when={currentSongData().current_song}>
       <section aria-label="Player controls" class="w-full">
         <button
+          onKeyDown={onSliderKeyDown}
           role="slider"
           aria-orientation="horizontal"
           aria-valuemin={0}
@@ -153,11 +198,12 @@ const Controls: Component = () => {
               onClick={togglePause}
               aria-label={currentSongData().paused_at ? 'Play' : 'Pause'}
             >
-              {currentSongData().paused_at ? (
+              <Show
+                when={currentSongData().paused_at}
+                fallback={<PauseIcon fill="currentColor" />}
+              >
                 <PlayIcon fill="currentColor" />
-              ) : (
-                <PauseIcon fill="currentColor" />
-              )}
+              </Show>
             </Button>
             <Button
               class="rounded-l-none"

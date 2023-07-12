@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:solid/recommended',
+    'plugin:solid/typescript',
     'plugin:@typescript-eslint/recommended',
     'plugin:jsx-a11y/recommended',
   ],
@@ -29,5 +29,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-non-null-assertion': 'off',
     'prefer-const': 'warn',
+    'solid/prefer-show': 'error',
+    'jsx-a11y/label-has-associated-control': 'off',
   },
 };

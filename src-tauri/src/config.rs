@@ -8,15 +8,50 @@ use std::{
 };
 use tauri::api::dialog::blocking::FileDialogBuilder;
 
-#[derive(Serialize, Deserialize, Clone, Type, Debug)]
+#[derive(Serialize, Deserialize, Clone, Type)]
+pub enum MainColor {
+  Slate,
+  Gray,
+  Zinc,
+  Neutral,
+  Stone,
+}
+
+#[derive(Serialize, Deserialize, Clone, Type)]
+pub enum AccentColor {
+  Red,
+  Orange,
+  Amber,
+  Yellow,
+  Lime,
+  Green,
+  Emerald,
+  Teal,
+  Cyan,
+  Blue,
+  Indigo,
+  Violet,
+  Purple,
+  Fuchsia,
+  Pink,
+  Rose,
+}
+
+#[derive(Serialize, Deserialize, Clone, Type)]
 pub struct Config {
   pub music_folders: Vec<PathBuf>,
+  pub dark_mode: bool,
+  pub main_color: MainColor,
+  pub accent_color: AccentColor,
 }
 
 impl Default for Config {
   fn default() -> Self {
     Self {
       music_folders: Vec::new(),
+      dark_mode: true,
+      main_color: MainColor::Zinc,
+      accent_color: AccentColor::Emerald,
     }
   }
 }
@@ -58,7 +93,6 @@ pub fn get_router() -> RouterBuilder<Context> {
     })
     .mutation("set", |t| {
       t(|ctx, input: Config| {
-        println!("set config: {:?}", input);
         let mut config = ctx.config.lock().unwrap();
         if input.music_folders != config.music_folders {
           *ctx.library.lock().unwrap() = library::read_from_dirs(&input.music_folders)
