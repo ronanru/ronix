@@ -1,11 +1,11 @@
 [package]
 name = "ronix"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+version = "0.2.0"
+description = "Music Player and Library Manager"
+authors = ["Matvey Ryabchikov"]
 edition = "2021"
+repository = "https://github.com/ronanru/ronix.git"
+license = "AGPL-3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
