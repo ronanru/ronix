@@ -173,8 +173,8 @@ const Controls: Component = () => {
             class="h-2 bg-accent-600 transition-[width] duration-75"
           />
         </button>
-        <div class="grid grid-cols-[1fr,10.5rem] items-center gap-4 p-4 md:grid-cols-[1fr,10.5rem,1fr]">
-          <div class="flex items-center gap-4 overflow-hidden md:col-span-1">
+        <div class="grid grid-cols-[1fr,10.5rem,1fr] items-center gap-4 p-4">
+          <div class="flex gap-4 overflow-hidden">
             <CoverArt
               src={currentAlbum().cover_art}
               class="h-14 w-14 rounded-xl"
@@ -213,13 +213,13 @@ const Controls: Component = () => {
               <SkipForwardIcon />
             </Button>
           </div>
-          <div class="col-span-2 md:col-span-1">
+          <div>
             <p class="relative -top-2 text-right text-sm">
               {currentMinutes()}:{currentSeconds()} / {durationMinutes()}:
               {durationSeconds()}
             </p>
             <div class="flex justify-end gap-2">
-              <div class="flex w-full gap-1 md:w-auto">
+              <div class="flex gap-1">
                 <Button
                   variant="ghost"
                   size="small"
@@ -242,7 +242,6 @@ const Controls: Component = () => {
                   </Switch>
                 </Button>
                 <input
-                  class="w-full md:w-auto"
                   type="range"
                   min={0}
                   max={1}
