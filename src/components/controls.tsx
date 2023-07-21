@@ -1,6 +1,7 @@
 import { api } from '@/api';
 import { CurrentSongData, RepeatMode } from '@/gen/tauri-types';
 import { library } from '@/library';
+import { navigate } from '@/router';
 import {
   PauseIcon,
   PlayIcon,
@@ -181,7 +182,17 @@ const Controls: Component = () => {
             />
             <div class="overflow-hidden">
               <p class="truncate font-bold">{currentSong().title}</p>
-              <p class="truncate">{currentArtist().name}</p>
+              <button
+                onClick={() =>
+                  navigate({
+                    name: 'artist',
+                    data: currentAlbum().artist,
+                  })
+                }
+                class="truncate hover:underline"
+              >
+                {currentArtist().name}
+              </button>
             </div>
           </div>
           <div class="flex">
