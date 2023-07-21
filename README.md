@@ -9,7 +9,7 @@ All linux music players suck, so I am making my own
 
 ## Download
 
-Download Ronix AppImage from the [releases page](https://github.com/ronanru/ronix/releases).
+Download Ronix player AppImage from the [releases page](https://github.com/ronanru/ronix/releases/).
 
 ## Features Roadmap
 
