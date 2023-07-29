@@ -20,3 +20,10 @@ Download Ronix AppImage from the [releases page](https://github.com/ronanru/roni
 - [ ] Song downloader with yt-dlp
 - [ ] Publish on flathub, the AUR
 - [ ] MacOS, Windows support
+
+## How to start
+
+- Install [pnpm](https://pnpm.io)
+- Install dependencies with `pnpm i`
+- Start in development mode with `pnpm tauri dev`
+- Compile with `pnpm tauri build` (AppImage builds only on Ubuntu)
