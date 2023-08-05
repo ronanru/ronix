@@ -1,6 +1,6 @@
 [package]
 name = "ronix"
-version = "0.2.0"
+version = "0.3.0"
 description = "Music Player and Library Manager"
 authors = ["Matvey Ryabchikov"]
 edition = "2021"
