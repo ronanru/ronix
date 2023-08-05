@@ -6,7 +6,21 @@ pkgdesc="A customizable music player and library manager"
 arch=('x86_64')
 url="https://github.com/ronanru/ronix"
 license=('AGPL3')
-depends=("yt-dlp" "sacad" "gstreamer")
+depends=(
+  "base-devel"
+  "webkit2gtk"
+  "curl"
+  "wget"
+  "file"
+  "openssl"
+  "appmenu-gtk-module"
+  "gtk3"
+  "libappindicator-gtk3"
+  "librsvg"
+  "libvips"
+  "yt-dlp"
+  "sacad"
+  "gstreamer")
 makedepends=("rust" "nodejs>=18" "pnpm")
 source=("ronix::https://github.com/ronanru/ronix/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=("9577f2edc933d0e67571833543b1d2a8c4a1e06f48eda26e3ad825da75bcb94e")
