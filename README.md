@@ -7,9 +7,19 @@ All linux music players suck, so I am making my own
 
 ![Screenshot](./screenshot.png)
 
-## Download
+## Installing
 
-Download Ronix AppImage from the [releases page](https://github.com/ronanru/ronix/releases).
+### On Arch Linux
+
+```sh
+git clone https://github.com/ronanru/ronix.git
+cd ronix
+makepkg -si
+```
+
+### Not on Arch Linux
+
+Get the AppImage [here](https://github.com/ronanru/ronix/releases/tag/v0.2.0)
 
 ## Features Roadmap
 
@@ -17,7 +27,7 @@ Download Ronix AppImage from the [releases page](https://github.com/ronanru/roni
 - [x] Fuzzy search
 - [x] Multiple themes
 - [ ] Song manager (Ability to edit song tags, delete songs)
-- [ ] Song downloader with yt-dlp
+- [x] Song downloader with yt-dlp
 - [ ] Publish on flathub, the AUR
 - [ ] MacOS, Windows support
 
