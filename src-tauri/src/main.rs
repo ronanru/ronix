@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod config;
+mod download;
 mod library;
 mod player;
 use config::{get_config_file, Config};
@@ -83,6 +84,7 @@ async fn main() {
     .merge("config.", config::get_router())
     .merge("player.", player::get_router())
     .merge("library.", library::get_router())
+    .merge("download.", download::get_router())
     .config(RspcConfig::new().export_ts_bindings("../src/gen/tauri-types.ts"))
     .build();
 

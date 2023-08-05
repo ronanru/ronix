@@ -1,5 +1,5 @@
 import { debounce } from '@solid-primitives/scheduled';
-import { ChevronLeftIcon, Search, SettingsIcon } from 'lucide-solid';
+import { ChevronLeftIcon, PlusIcon, Search, SettingsIcon } from 'lucide-solid';
 import {
   For,
   Match,
@@ -7,11 +7,13 @@ import {
   Suspense,
   Switch,
   createEffect,
+  createSignal,
   lazy,
   onCleanup,
   type Component,
 } from 'solid-js';
 import Controls from './components/controls';
+import DownloadSongModal from './components/downloadSongModal';
 import Button from './components/ui/button';
 import { config, generateCssVariables } from './config';
 import { currentPage, goBack, navigate } from './router';
@@ -27,13 +29,15 @@ import SongList from './views/songList';
 const Welcome = lazy(() => import('./views/welcome'));
 
 const App: Component = () => {
+  let searchInput: HTMLInputElement;
+
   const setSearch = debounce(
     (data: string) =>
       navigate({
         name: 'search',
         data,
       }),
-    250
+    250,
   );
 
   const onSearchBarInput = (e: Event & { currentTarget: HTMLInputElement }) => {
@@ -51,14 +55,14 @@ const App: Component = () => {
     const cssVars = generateCssVariables(
       conf.main_color,
       conf.accent_color,
-      conf.dark_mode
+      conf.dark_mode,
     );
     for (const key in cssVars) {
       /* eslint-disable @typescript-eslint/no-explicit-any */
       if (key.startsWith('--'))
         document.documentElement.style.setProperty(
           key,
-          cssVars[key as any] as any
+          cssVars[key as any] as any,
         );
       else
         document.documentElement.style[key as any] = cssVars[key as any] as any;
@@ -68,18 +72,27 @@ const App: Component = () => {
 
   onCleanup(() => setSearch.clear());
 
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = createSignal(false);
+
   return (
     <Suspense fallback={<Loading />}>
       <Show fallback={<Welcome />} when={config()?.music_folders.length}>
+        <DownloadSongModal
+          isOpen={isDownloadModalOpen()}
+          onClose={() => setIsDownloadModalOpen(false)}
+        />
         <header class="flex w-full items-center gap-4 p-4">
           <Show
-            when={
-              !['songs', 'albums', 'artists', 'search'].includes(
-                currentPage().name
-              )
-            }
+            when={!['songs', 'albums', 'artists'].includes(currentPage().name)}
           >
-            <Button role="link" onClick={goBack} aria-label="Back to songs">
+            <Button
+              role="link"
+              onClick={() => {
+                goBack();
+                searchInput.value = '';
+              }}
+              aria-label="Back"
+            >
               <ChevronLeftIcon />
             </Button>
           </Show>
@@ -95,6 +108,7 @@ const App: Component = () => {
               <Search class="ml-2" />
               <input
                 type="text"
+                ref={searchInput!}
                 class="w-full rounded-lg bg-transparent px-4 py-2 caret-accent-600 focus-visible:outline-none"
                 placeholder="Search"
                 onInput={onSearchBarInput}
@@ -112,6 +126,13 @@ const App: Component = () => {
               }
             >
               <SettingsIcon />
+            </Button>
+            <Button
+              role="link"
+              size="icon"
+              onClick={() => setIsDownloadModalOpen(true)}
+            >
+              <PlusIcon />
             </Button>
           </Show>
         </header>

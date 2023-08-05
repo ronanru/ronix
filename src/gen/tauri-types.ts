@@ -5,6 +5,7 @@ export type Procedures = {
         { key: "config.get", input: never, result: Config } | 
         { key: "config.getDefaultMusicFolder", input: never, result: string } | 
         { key: "config.pickFolder", input: never, result: string | null } | 
+        { key: "download.download", input: string, result: null } | 
         { key: "library.get", input: never, result: Library } | 
         { key: "library.search", input: string, result: SearchResults },
     mutations: 
@@ -37,9 +38,9 @@ export type CurrentSongData = { current_song: string | null; song_started_at: nu
 
 export type Album = { name: string; cover_art: string | null; artist: string }
 
-export type PlayerScope = "Library" | { Album: string } | { Artist: string }
-
 export type Config = { music_folders: string[]; dark_mode: boolean; main_color: MainColor; accent_color: AccentColor }
+
+export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
 export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }
 
