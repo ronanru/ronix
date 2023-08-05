@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Ronix
+Exec="/usr/bin/ronix"
+Terminal=false
+Type=Application
+Icon=ronix
+Comment=A customizable music player and library manager
+Categories=AudioVideo;Player;Audio;
