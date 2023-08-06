@@ -55,7 +55,7 @@ const Controls: Component = () => {
       currentSongData().paused_at
         ? (currentSongData().paused_at! - currentSongData().song_started_at) *
             1000
-        : Date.now() - currentSongData().song_started_at * 1000
+        : Date.now() - currentSongData().song_started_at * 1000,
     );
   const update = () => {
     updateCurrentTime();
@@ -82,7 +82,7 @@ const Controls: Component = () => {
 
   const onSeek = (e: MouseEvent & { currentTarget: HTMLButtonElement }) => {
     const seekTo = Math.floor(
-      (e.clientX / e.currentTarget.clientWidth) * currentSong()!.duration
+      (e.clientX / e.currentTarget.clientWidth) * currentSong()!.duration,
     );
     api.mutation(['player.seek', seekTo]);
   };
@@ -96,7 +96,7 @@ const Controls: Component = () => {
       updateCurrentTime();
       if (currentSongData().paused_at) cancelAnimationFrame(animationFrame!);
       else update();
-    })
+    }),
   );
 
   const toggleShuffle = () =>
@@ -145,7 +145,7 @@ const Controls: Component = () => {
           'player.seek',
           Math.min(
             currentSongDuration(),
-            Math.floor(currentTime() / 1000) + 30
+            Math.floor(currentTime() / 1000) + 30,
           ),
         ]);
         break;
@@ -230,7 +230,7 @@ const Controls: Component = () => {
               {durationSeconds()}
             </p>
             <div class="flex justify-end gap-2">
-              <div class="flex w-full gap-1 md:w-auto">
+              <div class="flex gap-1">
                 <Button
                   variant="ghost"
                   size="small"
@@ -253,7 +253,6 @@ const Controls: Component = () => {
                   </Switch>
                 </Button>
                 <input
-                  class="w-full md:w-auto"
                   type="range"
                   min={0}
                   max={1}
