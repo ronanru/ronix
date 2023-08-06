@@ -157,7 +157,7 @@ const App: Component = () => {
             </For>
           </nav>
         </Show>
-        <main class="w-full flex-1 overflow-y-auto px-4">
+        <main class="w-full flex-1 overflow-y-auto px-4 scrollbar-thin scrollbar-thumb-primary-500">
           <div class="mb-2">
             <Switch>
               <Match when={currentPage().name === 'songs'}>
