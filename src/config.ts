@@ -6,7 +6,7 @@ import { Config } from './gen/tauri-types';
 import { refetchLibrary } from './library';
 
 const [config, { mutate }] = createResource<Config>(() =>
-  api.query(['config.get'])
+  api.query(['config.get']),
 );
 
 const setConfig = async (newConfig: Config) => {
@@ -25,14 +25,14 @@ type TailwindColor = (typeof tailwindColors)[number];
 
 const getColorNumber = (color: number, darkMode: boolean) => {
   return tailwindColors.at(
-    color * (darkMode ? 1 : -1) - (darkMode ? 0 : 1)
+    color * (darkMode ? 1 : -1) - (darkMode ? 0 : 1),
   ) as TailwindColor;
 };
 
 export const generateCssVariables = (
   mainColor: string,
   accentColor: string,
-  darkMode: boolean
+  darkMode: boolean,
 ): JSX.CSSProperties => {
   const styles: JSX.CSSProperties = {
     '--color-white': darkMode ? '#ffffff' : '#000000',

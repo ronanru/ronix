@@ -8,14 +8,14 @@ import SongList from './songList';
 
 const SearchPage: Component<{ query: string }> = (props) => {
   const [searchResults, setSearchResults] = createSignal<SearchResults | null>(
-    null
+    null,
   );
 
   createEffect(
     on(
       () => props.query,
-      (query) => api.query(['library.search', query]).then(setSearchResults)
-    )
+      (query) => api.query(['library.search', query]).then(setSearchResults),
+    ),
   );
 
   return (

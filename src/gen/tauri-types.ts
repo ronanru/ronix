@@ -5,11 +5,12 @@ export type Procedures = {
         { key: "config.get", input: never, result: Config } | 
         { key: "config.getDefaultMusicFolder", input: never, result: string } | 
         { key: "config.pickFolder", input: never, result: string | null } | 
-        { key: "download.download", input: string, result: null } | 
+        { key: "download.download", input: string, result: string } | 
         { key: "library.get", input: never, result: Library } | 
         { key: "library.search", input: string, result: SearchResults },
     mutations: 
         { key: "config.set", input: Config, result: null } | 
+        { key: "library.deleteSong", input: string, result: string } | 
         { key: "player.nextSong", input: never, result: null } | 
         { key: "player.playSong", input: PlaySongInput, result: null } | 
         { key: "player.previousSong", input: never, result: null } | 

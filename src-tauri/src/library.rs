@@ -228,4 +228,19 @@ pub fn get_router() -> RouterBuilder<Context> {
         }
       })
     })
+    .mutation("deleteSong", |t| {
+      t(|ctx, input: String| {
+        let mut library = ctx.library.lock().unwrap();
+        match library.songs.get(&input) {
+          Some(song) => match fs::remove_file(&song.path) {
+            Ok(_) => {
+              library.songs.remove(&input);
+              "Successfully deleted".to_string()
+            }
+            Err(e) => e.to_string(),
+          },
+          None => "Could not find song to delete".to_string(),
+        }
+      })
+    })
 }

@@ -21,7 +21,7 @@ const ColorInput: Component<{
     const index = props.colors.findIndex((c) => c.name === props.value);
     const newIndex = index + (upButtons.includes(e.key) ? -1 : 1);
     props.onChange(
-      (props.colors.at(newIndex % props.colors.length) as Color).name
+      (props.colors.at(newIndex % props.colors.length) as Color).name,
     );
   };
 

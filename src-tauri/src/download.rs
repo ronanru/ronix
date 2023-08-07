@@ -1,8 +1,7 @@
-use std::process::Command;
-
 use crate::{library, Context};
-use rspc::{Error, ErrorCode, Router, RouterBuilder, Type};
+use rspc::{Router, RouterBuilder, Type};
 use serde::Serialize;
+use std::process::Command;
 
 #[derive(Serialize, Type)]
 struct YoutubeVideo {
@@ -27,23 +26,17 @@ pub fn get_router() -> RouterBuilder<Context> {
         .current_dir(&folders[0])
         .status();
       if !ytdl.map(|s| s.success()).unwrap_or(false) {
-        return Err(Error::new(
-          ErrorCode::InternalServerError,
-          "Failed to download video with yt-dlp".to_string(),
-        ));
+        return "Failed to download video with yt-dlp";
       }
       let sacad = Command::new("sacad_r")
         .args(["-f", ".", "600", "+"])
         .current_dir(&folders[0])
         .status();
       if !sacad.map(|s| s.success()).unwrap_or(false) {
-        return Err(Error::new(
-          ErrorCode::InternalServerError,
-          "Failed to convert video with sacad_r".to_string(),
-        ));
+        return "Failed to convert video with sacad_r";
       }
       *ctx.library.lock().unwrap() = library::read_from_dirs(&folders);
-      Ok(())
+      "Download successful"
     })
   })
 }

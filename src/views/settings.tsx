@@ -143,7 +143,7 @@ const Settings: Component = () => {
         style={generateCssVariables(
           config.main_color,
           config.accent_color,
-          config.dark_mode
+          config.dark_mode,
         )}
       >
         <div class="my-4 rounded-lg border-2 border-accent-600 bg-primary-950 px-4 py-2 text-primary-100">

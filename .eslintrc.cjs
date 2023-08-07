@@ -31,5 +31,6 @@ module.exports = {
     'prefer-const': 'warn',
     'solid/prefer-show': 'error',
     'jsx-a11y/label-has-associated-control': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
   },
 };

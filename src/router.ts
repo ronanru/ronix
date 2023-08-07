@@ -7,6 +7,7 @@ export const MainPages = [
   'search',
   'settings',
   'about',
+  'library Manager',
 ] as const;
 
 type PageData =
@@ -37,7 +38,7 @@ export const goBack = () => {
   setCurrentPage(
     previousPages.pop() || {
       name: 'songs',
-    }
+    },
   );
 };
 

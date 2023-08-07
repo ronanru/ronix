@@ -1,5 +1,7 @@
 import { Show, type Component } from 'solid-js';
 import CoverArt from './components/coverArt';
+import Button from './components/ui/button';
+import { Trash2Icon } from 'lucide-solid';
 
 const SongButton: Component<{
   title: string;
@@ -9,6 +11,8 @@ const SongButton: Component<{
   noArtist?: boolean;
   noCoverArt?: boolean;
   onClick?: (e: MouseEvent) => void;
+  isManager?: boolean;
+  onDelete?: () => void;
 }> = (props) => {
   return (
     <button
@@ -27,10 +31,17 @@ const SongButton: Component<{
           <button class="block truncate">{props.artist}</button>
         </Show>
       </div>
-      <p class="flex-shrink-0">
-        {Math.floor(props.duration / 60)}:
-        {(props.duration % 60).toString().padStart(2, '0')}
-      </p>
+      <Show when={props.isManager}
+        fallback={
+          <p class="flex-shrink-0">
+            {Math.floor(props.duration / 60)}:
+            {(props.duration % 60).toString().padStart(2, '0')}
+          </p>}
+      >
+        <Button variant="danger" size="icon" onClick={props.onDelete}>
+          <Trash2Icon />
+        </Button>
+      </Show>
     </button>
   );
 };

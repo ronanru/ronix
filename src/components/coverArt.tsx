@@ -13,8 +13,8 @@ const CoverArt: Component<{
       fallback={
         <div
           class={cx(
-            'bg-accent-900 grid aspect-square h-full place-items-center text-accent-100 transition-colors',
-            props.class
+            'grid aspect-square h-full place-items-center bg-accent-900 text-accent-100 transition-colors',
+            props.class,
           )}
         >
           <MusicIcon />

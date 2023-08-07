@@ -1,5 +1,5 @@
 import { debounce } from '@solid-primitives/scheduled';
-import { ChevronLeftIcon, PlusIcon, Search, SettingsIcon } from 'lucide-solid';
+import { ChevronLeftIcon, Search } from 'lucide-solid';
 import {
   For,
   Match,
@@ -14,6 +14,7 @@ import {
 } from 'solid-js';
 import Controls from './components/controls';
 import DownloadSongModal from './components/downloadSongModal';
+import Menu from './components/menu';
 import Button from './components/ui/button';
 import { config, generateCssVariables } from './config';
 import { currentPage, goBack, navigate } from './router';
@@ -97,7 +98,7 @@ const App: Component = () => {
             </Button>
           </Show>
           <Show
-            when={currentPage().name !== 'settings'}
+            when={!['settings', 'library Manager'].includes(currentPage().name)}
             fallback={
               <h1 class="flex-1 text-4xl font-bold capitalize">
                 {currentPage().name}
@@ -114,26 +115,7 @@ const App: Component = () => {
                 onInput={onSearchBarInput}
               />
             </div>
-          </Show>
-          <Show when={currentPage().name !== 'settings'}>
-            <Button
-              role="link"
-              size="icon"
-              onClick={() =>
-                navigate({
-                  name: 'settings',
-                })
-              }
-            >
-              <SettingsIcon />
-            </Button>
-            <Button
-              role="link"
-              size="icon"
-              onClick={() => setIsDownloadModalOpen(true)}
-            >
-              <PlusIcon />
-            </Button>
+            <Menu onOpenDownloadModal={() => setIsDownloadModalOpen(true)} />
           </Show>
         </header>
         <Show
@@ -157,7 +139,7 @@ const App: Component = () => {
             </For>
           </nav>
         </Show>
-        <main class="w-full flex-1 overflow-y-auto px-4 scrollbar-thin scrollbar-thumb-primary-500">
+        <main class="w-full flex-1 overflow-y-auto px-4 scrollbar-thin scrollbar-thumb-primary-600">
           <div class="mb-2">
             <Switch>
               <Match when={currentPage().name === 'songs'}>
@@ -180,6 +162,9 @@ const App: Component = () => {
               </Match>
               <Match when={currentPage().name === 'settings'}>
                 <Settings />
+              </Match>
+              <Match when={currentPage().name === 'library Manager'}>
+                <SongList isManager />
               </Match>
             </Switch>
           </div>

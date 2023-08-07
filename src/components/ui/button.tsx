@@ -9,6 +9,7 @@ const buttonVariants = cva(
         default: 'bg-primary-800 hover:bg-primary-700',
         light: 'bg-primary-700 hover:bg-primary-600',
         accent: 'bg-accent-600 hover:bg-accent-700',
+        danger: 'bg-red-500 hover:bg-red-600',
         ghost: 'hover:bg-primary-900',
       },
       size: {
@@ -21,14 +22,14 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  }
+  },
 );
 
 const Button: Component<
   {
     children?: JSX.Element | JSX.Element[] | string;
   } & ComponentProps<'button'> &
-    VariantProps<typeof buttonVariants>
+  riantProps<typeof buttonVariants>
 > = (props) => {
   const [local, btnProps] = splitProps(props, [
     'children',

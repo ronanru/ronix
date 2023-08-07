@@ -10,7 +10,7 @@ export type FullSong = Song & {
 };
 
 const [library, { refetch }] = createResource<Library>(() =>
-  api.query(['library.get'])
+  api.query(['library.get']),
 );
 
 export const refetchLibrary = refetch;
