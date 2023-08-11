@@ -11,6 +11,8 @@ export type Procedures = {
     mutations: 
         { key: "config.set", input: Config, result: null } | 
         { key: "library.deleteSong", input: string, result: string } | 
+        { key: "library.editSong", input: EditSongInput, result: string } | 
+        { key: "library.refresh", input: never, result: null } | 
         { key: "player.nextSong", input: never, result: null } | 
         { key: "player.playSong", input: PlaySongInput, result: null } | 
         { key: "player.previousSong", input: never, result: null } | 
@@ -25,15 +27,17 @@ export type Procedures = {
 
 export type RepeatMode = "None" | "One" | "All"
 
-export type PlaySongInput = { song_id: string; scope: PlayerScope }
+export type Song = { title: string; path: string; duration: number; album: string }
 
-export type Artist = { name: string }
+export type PlaySongInput = { song_id: string; scope: PlayerScope }
 
 export type MainColor = "Slate" | "Gray" | "Zinc" | "Neutral" | "Stone"
 
+export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }
+
 export type Library = { artists: { [key: string]: Artist }; albums: { [key: string]: Album }; songs: { [key: string]: Song } }
 
-export type Song = { title: string; path: string; duration: number; album: string }
+export type EditSongInput = { id: string; title: string; album: string; artist: string }
 
 export type CurrentSongData = { current_song: string | null; song_started_at: number; paused_at: number | null; volume: number }
 
@@ -43,6 +47,6 @@ export type Config = { music_folders: string[]; dark_mode: boolean; main_color: 
 
 export type PlayerScope = "Library" | { Album: string } | { Artist: string }
 
-export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }
+export type Artist = { name: string }
 
 export type AccentColor = "Red" | "Orange" | "Amber" | "Yellow" | "Lime" | "Green" | "Emerald" | "Teal" | "Cyan" | "Blue" | "Indigo" | "Violet" | "Purple" | "Fuchsia" | "Pink" | "Rose"

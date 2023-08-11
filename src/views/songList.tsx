@@ -1,9 +1,17 @@
 import { api } from '@/api';
 import Button from '@/components/ui/button';
 import Modal from '@/components/ui/modal';
+import TextInput from '@/components/ui/textInput';
 import { library, refetchLibrary } from '@/library';
 import SongButton from '@/songButton';
-import { For, Show, createSignal, type Component } from 'solid-js';
+import {
+  For,
+  Match,
+  Show,
+  Switch,
+  createSignal,
+  type Component,
+} from 'solid-js';
 
 const SongList: Component<{
   albums?: string[];
@@ -12,7 +20,12 @@ const SongList: Component<{
   noSort?: boolean;
   isManager?: boolean;
 }> = (props) => {
-  const [songToDelete, setSongToDelete] = createSignal<string | null>(null);
+  const [songToEdit, setSongToEdit] = createSignal<string | null>(null);
+  const [operation, setOperation] = createSignal<'EDIT' | 'DELETE'>('EDIT');
+
+  const songEditData = () => library()?.songs[songToEdit()!];
+  const albumEditData = () => library()?.albums[songEditData()!.album!];
+  const artistEditData = () => library()?.artists[albumEditData()!.artist!];
 
   const [isLoading, setIsLoading] = createSignal(false);
   const [returnText, setReturnText] = createSignal<string | null>(null);
@@ -47,37 +60,95 @@ const SongList: Component<{
   return (
     <>
       <Modal
-        isOpen={!!props.isManager && !!songToDelete()}
-        onClose={() => setSongToDelete(null) !== null}
+        isOpen={!!props.isManager && !!songToEdit()}
+        onClose={() => setSongToEdit(null) !== null}
         title={
           returnText() ??
           (isLoading()
-            ? 'Deleting...'
-            : `Do you really want to delete "${library()?.songs[songToDelete()!]
-                .title}"?`)
+            ? {
+                DELETE: 'Deleting...',
+                EDIT: 'Editing...',
+              }[operation()]
+            : `${
+                {
+                  DELETE: 'Do you really want to delete',
+                  EDIT: 'Edit',
+                }[operation()]
+              } "${library()?.songs[songToEdit()!].title}"?`)
         }
         disableClosing={!returnText()}
       >
         <Show when={!returnText() && !isLoading()}>
-          <div class="flex justify-end gap-2">
-            <Button
-              variant="danger"
-              onClick={() => {
-                setIsLoading(true);
-                api
-                  .mutation(['library.deleteSong', songToDelete()!])
-                  .then((text) => {
-                    setReturnText(text);
-                    refetchLibrary();
-                  });
-              }}
-            >
-              Yes
-            </Button>
-            <Button onClick={() => setSongToDelete(null)}>No</Button>
-          </div>
+          <Switch>
+            <Match when={operation() === 'DELETE'}>
+              <div class="flex justify-end gap-2">
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    setIsLoading(true);
+                    api
+                      .mutation(['library.deleteSong', songToEdit()!])
+                      .then((text) => {
+                        setReturnText(text);
+                        refetchLibrary();
+                      });
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button onClick={() => setSongToEdit(null)}>No</Button>
+              </div>
+            </Match>
+            <Match when={operation() === 'EDIT'}>
+              <form
+                class="space-y-4"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setIsLoading(true);
+                  const formData = new FormData(e.currentTarget);
+                  api
+                    .mutation([
+                      'library.editSong',
+                      {
+                        album: formData.get('album') as string,
+                        title: formData.get('title') as string,
+                        artist: formData.get('artist') as string,
+                        id: songToEdit()!,
+                      },
+                    ])
+                    .then((text) => {
+                      setReturnText(text);
+                      refetchLibrary();
+                    });
+                }}
+              >
+                <TextInput
+                  name="title"
+                  label="Title"
+                  value={songEditData()?.title}
+                />
+                <TextInput
+                  name="album"
+                  label="Album"
+                  value={albumEditData()?.name}
+                />
+                <TextInput
+                  name="artist"
+                  label="Artist"
+                  value={artistEditData()?.name}
+                />
+                <div class="flex justify-end gap-2">
+                  <Button onClick={() => setSongToEdit(null)}>Cancel</Button>
+                  <Button variant="accent" type="submit">
+                    Edit
+                  </Button>
+                </div>
+              </form>
+            </Match>
+          </Switch>
         </Show>
       </Modal>
+
       <div class="flex flex-col overflow-x-hidden">
         <For
           each={songs()}
@@ -91,7 +162,13 @@ const SongList: Component<{
               coverArt={song.cover_art}
               isManager={props.isManager}
               onDelete={() => {
-                setSongToDelete(song.id);
+                setSongToEdit(song.id);
+                setOperation('DELETE');
+                setIsLoading(false);
+              }}
+              onEdit={() => {
+                setSongToEdit(song.id);
+                setOperation('EDIT');
                 setIsLoading(false);
               }}
               onClick={() =>

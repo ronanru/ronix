@@ -33,7 +33,7 @@ pub fn get_router() -> RouterBuilder<Context> {
         .current_dir(&folders[0])
         .status();
       if !sacad.map(|s| s.success()).unwrap_or(false) {
-        return "Failed to convert video with sacad_r";
+        return "Failed to download cover art with sacad_r";
       }
       *ctx.library.lock().unwrap() = library::read_from_dirs(&folders);
       "Download successful"

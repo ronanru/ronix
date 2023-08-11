@@ -1,16 +1,17 @@
 use crate::{Context, PlayerScope};
 use fuse_rust::Fuse;
-use lofty::{Accessor, AudioFile, MimeType, Probe, TaggedFileExt};
+use lofty::{Accessor, AudioFile, MimeType, Probe, TagExt, TaggedFileExt};
 use nanoid::nanoid;
 use rand::prelude::*;
 use rspc::{Router, RouterBuilder, Type};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
   collections::HashMap,
   fs::{self, create_dir_all, File},
   hash::Hash,
   io::Write,
   path::PathBuf,
+  process::Command,
 };
 use walkdir::WalkDir;
 
@@ -187,6 +188,14 @@ struct SearchResults {
   songs: Vec<String>,
 }
 
+#[derive(Deserialize, Type)]
+struct EditSongInput {
+  id: String,
+  title: String,
+  album: String,
+  artist: String,
+}
+
 pub fn get_router() -> RouterBuilder<Context> {
   Router::<Context>::new()
     .query("get", |t| {
@@ -241,6 +250,57 @@ pub fn get_router() -> RouterBuilder<Context> {
           },
           None => "Could not find song to delete".to_string(),
         }
+      })
+    })
+    .mutation("editSong", |t| {
+      t(|ctx, input: EditSongInput| {
+        let mut library = ctx.library.lock().unwrap();
+        match library.songs.get(&input.id) {
+          Some(song) => {
+            match Probe::open(&song.path)
+              .ok()
+              .map(|f| f.read().ok())
+              .flatten()
+            {
+              Some(mut tagged_file) => {
+                let tags_option = match tagged_file.primary_tag_mut() {
+                  Some(primary_tag) => Some(primary_tag),
+                  None => tagged_file.first_tag_mut(),
+                };
+                match tags_option {
+                  Some(tags) => {
+                    tags.set_title(input.title);
+                    tags.set_album(input.album);
+                    tags.set_artist(input.artist);
+                    for i in 0..tags.picture_count() {
+                      tags.remove_picture(i as usize);
+                    }
+                    if tags.save_to_path(&song.path).is_err() {
+                      return "Failed to edit song";
+                    }
+                    let sacad = Command::new("sacad_r")
+                      .args(["-f", ".", "600", "+"])
+                      .current_dir(&song.path.parent().unwrap())
+                      .status();
+                    if !sacad.map(|s| s.success()).unwrap_or(false) {
+                      return "Failed to download cover art with sacad_r";
+                    }
+                    *library = read_from_dirs(&ctx.config.lock().unwrap().music_folders);
+                    "Successfully edited"
+                  }
+                  None => "Could not edit song",
+                }
+              }
+              None => "Could not find song to edit",
+            }
+          }
+          None => "Could not find song to edit",
+        }
+      })
+    })
+    .mutation("refresh", |t| {
+      t(|ctx, _: ()| {
+        *ctx.library.lock().unwrap() = read_from_dirs(&ctx.config.lock().unwrap().music_folders);
       })
     })
 }

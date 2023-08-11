@@ -1,5 +1,13 @@
+import { api } from '@/api';
+import { refetchLibrary } from '@/library';
 import { navigate } from '@/router';
-import { FolderIcon, MenuIcon, PlusIcon, SettingsIcon } from 'lucide-solid';
+import {
+  FolderIcon,
+  MenuIcon,
+  PlusIcon,
+  RefreshCcwIcon,
+  SettingsIcon,
+} from 'lucide-solid';
 import {
   For,
   Show,
@@ -35,6 +43,12 @@ const Menu: Component<{
         closeMenu();
       },
       id: 'downloadSong',
+    },
+    {
+      icon: RefreshCcwIcon,
+      name: 'Refresh library',
+      onClick: () => api.mutation(['library.refresh']).then(refetchLibrary),
+      id: 'refreshLibrary',
     },
     {
       icon: FolderIcon,

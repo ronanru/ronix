@@ -28,7 +28,7 @@ Get the AppImage [here](https://github.com/ronanru/ronix/releases/tag/v0.2.0)
 - [x] Plays music (All traditional music player features)
 - [x] Fuzzy search
 - [x] Multiple themes
-- [ ] Song manager (Ability to edit song tags, delete songs)
+- [x] Song manager (Ability to edit song tags, delete songs)
 - [x] Song downloader with yt-dlp
 - [x] Publish on the AUR
 - [ ] Publish on flathub
