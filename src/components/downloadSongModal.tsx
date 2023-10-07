@@ -1,6 +1,6 @@
 import { api } from '@/api';
 import { refetchLibrary } from '@/library';
-import { Show, createSignal, type Component } from 'solid-js';
+import { Show, createEffect, createSignal, on, type Component } from 'solid-js';
 import Button from './ui/button';
 import Modal from './ui/modal';
 
@@ -22,6 +22,16 @@ const DownloadSongModal: Component<{ isOpen: boolean; onClose: () => void }> = (
       setReturnText(text);
     });
   };
+
+  createEffect(
+    on(
+      () => props.isOpen,
+      () => {
+        setReturnText(null);
+        setIsLoading(false);
+      },
+    ),
+  );
 
   return (
     <Modal

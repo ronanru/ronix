@@ -7,7 +7,7 @@ export type Procedures = {
         { key: "config.pickFolder", input: never, result: string | null } | 
         { key: "download.download", input: string, result: string } | 
         { key: "library.get", input: never, result: Library } | 
-        { key: "library.search", input: string, result: SearchResults },
+        { key: "library.search", input: SearchInput, result: SearchResults },
     mutations: 
         { key: "config.set", input: Config, result: null } | 
         { key: "library.deleteSong", input: string, result: string } | 
@@ -33,7 +33,11 @@ export type PlaySongInput = { song_id: string; scope: PlayerScope }
 
 export type MainColor = "Slate" | "Gray" | "Zinc" | "Neutral" | "Stone"
 
-export type SearchResults = { artists: string[]; albums: string[]; songs: string[] }
+export type SearchMode = "Library" | "Songs"
+
+export type SearchInput = { query: string; mode: SearchMode }
+
+export type SearchResults = { artists: string[] | null; albums: string[] | null; songs: string[] }
 
 export type Library = { artists: { [key: string]: Artist }; albums: { [key: string]: Album }; songs: { [key: string]: Song } }
 

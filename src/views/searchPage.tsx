@@ -6,7 +6,9 @@ import ArtistList from './artistsList';
 import Loading from './loading';
 import SongList from './songList';
 
-const SearchPage: Component<{ query: string }> = (props) => {
+const SearchPage: Component<{ query: string; isManager: boolean }> = (
+  props,
+) => {
   const [searchResults, setSearchResults] = createSignal<SearchResults | null>(
     null,
   );
@@ -14,7 +16,16 @@ const SearchPage: Component<{ query: string }> = (props) => {
   createEffect(
     on(
       () => props.query,
-      (query) => api.query(['library.search', query]).then(setSearchResults),
+      (query) =>
+        api
+          .query([
+            'library.search',
+            {
+              mode: props.isManager ? 'Songs' : 'Library',
+              query,
+            },
+          ])
+          .then(setSearchResults),
     ),
   );
 
@@ -24,19 +35,23 @@ const SearchPage: Component<{ query: string }> = (props) => {
       <Show when={searchResults()?.artists}>
         <section aria-label="Artists" class="mt-8">
           <h2 class="mb-4 text-2xl font-bold">Artists</h2>
-          <ArtistList ids={searchResults()?.artists} noSort />
+          <ArtistList ids={searchResults()!.artists!} noSort />
         </section>
       </Show>
       <Show when={searchResults()?.albums}>
         <section aria-label="Albums" class="mt-8">
           <h2 class="mb-4 text-2xl font-bold">Albums</h2>
-          <AlbumList ids={searchResults()?.albums} noSort />
+          <AlbumList ids={searchResults()!.albums!} noSort />
         </section>
       </Show>
       <Show when={searchResults()?.songs}>
         <section aria-label="Songs" class="mt-8">
           <h2 class="mb-4 text-2xl font-bold">Songs</h2>
-          <SongList ids={searchResults()?.songs} noSort />
+          <SongList
+            ids={searchResults()?.songs}
+            noSort
+            isManager={props.isManager}
+          />
         </section>
       </Show>
     </Show>

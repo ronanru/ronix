@@ -183,8 +183,8 @@ pub fn get_automatic_next_songs(
 
 #[derive(Serialize, Type)]
 struct SearchResults {
-  artists: Vec<String>,
-  albums: Vec<String>,
+  artists: Option<Vec<String>>,
+  albums: Option<Vec<String>>,
   songs: Vec<String>,
 }
 
@@ -196,13 +196,25 @@ struct EditSongInput {
   artist: String,
 }
 
+#[derive(Deserialize, Type)]
+enum SearchMode {
+  Library,
+  Songs,
+}
+
+#[derive(Deserialize, Type)]
+struct SearchInput {
+  query: String,
+  mode: SearchMode,
+}
+
 pub fn get_router() -> RouterBuilder<Context> {
   Router::<Context>::new()
     .query("get", |t| {
       t(|ctx, _input: ()| ctx.library.lock().unwrap().clone())
     })
     .query("search", |t| {
-      t(|ctx, query: String| {
+      t(|ctx, input: SearchInput| {
         let library = ctx.library.lock().unwrap();
         let fuse = Fuse {
           location: 0,
@@ -214,26 +226,61 @@ pub fn get_router() -> RouterBuilder<Context> {
         };
         let artists: Vec<String> = fuse
           .search_text_in_iterable(
-            &query,
+            &input.query,
             library.artists.iter().map(|(_, artist)| &artist.name),
           )
           .iter()
           .map(|a| library.artists.iter().nth(a.index).unwrap().0.to_string())
           .collect();
         let albums: Vec<String> = fuse
-          .search_text_in_iterable(&query, library.albums.iter().map(|(_, album)| &album.name))
+          .search_text_in_iterable(
+            &input.query,
+            library.albums.iter().map(|(_, album)| &album.name),
+          )
           .iter()
           .map(|a| library.albums.iter().nth(a.index).unwrap().0.to_string())
           .collect();
-        let songs: Vec<String> = fuse
-          .search_text_in_iterable(&query, library.songs.iter().map(|(_, song)| &song.title))
+        let mut songs: Vec<String> = fuse
+          .search_text_in_iterable(
+            &input.query,
+            library.songs.iter().map(|(_, song)| &song.title),
+          )
           .iter()
           .map(|a| library.songs.iter().nth(a.index).unwrap().0.to_string())
           .collect();
-        SearchResults {
-          artists,
-          albums,
-          songs,
+        match input.mode {
+          SearchMode::Library => SearchResults {
+            artists: Some(artists),
+            albums: Some(albums),
+            songs: songs,
+          },
+          SearchMode::Songs => {
+            songs.extend(
+              library
+                .songs
+                .iter()
+                .filter_map(|(song_id, song)| {
+                  if songs.contains(song_id) {
+                    return Some(song_id);
+                  }
+                  if albums.contains(&song.album) {
+                    return Some(song_id);
+                  }
+                  let album = library.albums.get(&song.album).unwrap();
+                  if artists.contains(&album.artist) {
+                    return Some(song_id);
+                  }
+                  return None;
+                })
+                .cloned()
+                .collect::<Vec<String>>(),
+            );
+            SearchResults {
+              artists: None,
+              albums: None,
+              songs,
+            }
+          }
         }
       })
     })

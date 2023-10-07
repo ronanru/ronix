@@ -10,14 +10,19 @@ export const MainPages = [
   'library Manager',
 ] as const;
 
-type PageData =
+export type SearchPageData = {
+  query: string;
+  isManager: boolean;
+};
+
+export type PageData =
   | {
       name: (typeof MainPages)[number];
       data?: undefined;
     }
   | {
       name: 'search';
-      data: string;
+      data: SearchPageData;
     }
   | {
       name: 'artist';

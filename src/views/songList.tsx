@@ -61,7 +61,11 @@ const SongList: Component<{
     <>
       <Modal
         isOpen={!!props.isManager && !!songToEdit()}
-        onClose={() => setSongToEdit(null) !== null}
+        onClose={() => {
+          setSongToEdit(null);
+          setIsLoading(false);
+          setReturnText(null);
+        }}
         title={
           returnText() ??
           (isLoading()

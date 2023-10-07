@@ -17,7 +17,7 @@ import DownloadSongModal from './components/downloadSongModal';
 import Menu from './components/menu';
 import Button from './components/ui/button';
 import { config, generateCssVariables } from './config';
-import { currentPage, goBack, navigate } from './router';
+import { SearchPageData, currentPage, goBack, navigate } from './router';
 import AlbumList from './views/albumList';
 import AlbumPage from './views/albumPage';
 import ArtistPage from './views/artistPage';
@@ -33,10 +33,17 @@ const App: Component = () => {
   let searchInput: HTMLInputElement;
 
   const setSearch = debounce(
-    (data: string) =>
+    (query: string) =>
       navigate({
         name: 'search',
-        data,
+        data: {
+          query,
+          isManager:
+            currentPage().name === 'library Manager' ||
+            (typeof currentPage().data === 'object' &&
+              'isManager' in (currentPage().data as object) &&
+              (currentPage().data as SearchPageData).isManager),
+        },
       }),
     250,
   );
@@ -98,7 +105,7 @@ const App: Component = () => {
             </Button>
           </Show>
           <Show
-            when={!['settings', 'library Manager'].includes(currentPage().name)}
+            when={!['settings'].includes(currentPage().name)}
             fallback={
               <h1 class="flex-1 text-4xl font-bold capitalize">
                 {currentPage().name}
@@ -158,7 +165,10 @@ const App: Component = () => {
                 <AlbumPage albumId={currentPage().data as string} />
               </Match>
               <Match when={currentPage().name === 'search'}>
-                <SearchPage query={currentPage().data as string} />
+                <SearchPage
+                  query={(currentPage().data as SearchPageData).query}
+                  isManager={(currentPage().data as SearchPageData).isManager}
+                />
               </Match>
               <Match when={currentPage().name === 'settings'}>
                 <Settings />
